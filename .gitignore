@@ -1,0 +1,11 @@
+.history
+dist
+/.idea
+/*.iml
+/.idea_modules
+/.settings
+.DS_Store
+src/config.js
+node_modules
+npm-debug.log
+.env

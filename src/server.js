@@ -1,0 +1,42 @@
+import uuid from 'node-uuid';
+import { List } from 'immutable';
+
+import express from 'express';
+import webpack from 'webpack';
+
+import config from '../webpack.config';
+import bodyParser from 'body-parser';
+
+const app = express();
+const compiler = webpack(config);
+const port = 8888;
+
+app.use(require('webpack-dev-middleware')(compiler, {
+  noInfo: false,
+  publicPath: config.output.publicPath
+}));
+
+app.use(bodyParser.json());
+
+app.use(require('webpack-hot-middleware')(compiler));
+
+app.get('/api/irc', function(req, res, next) {
+    res.send({
+        status: 'ok'
+    });
+});
+
+app.get('*', function(req, res, next) {
+  res.sendFile(path.join(__dirname, '/../web/index.dev.html'));
+});
+
+
+app.listen(port, 'localhost', function(err) {
+  if (err) {
+    console.log(err);
+    return;
+  }
+
+  console.log('Listening at http://localhost:' + port);
+});
+
