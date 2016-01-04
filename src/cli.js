@@ -7,12 +7,12 @@ var util = require('util');
 //var net = require('net');
 
 import net from 'net';
+import {CommandFactory, Command} from './components/domain/Command';
 
 var client = new net.Socket();
 var connected = false;
 
 process.stdin.on('data', function (input) {
-
 	try {
 		input = input.replace(/\r?\n|\r/g,"");
 		let command = getCommand(input);
@@ -29,8 +29,6 @@ process.stdin.on('data', function (input) {
 	} catch (e) {
 		console.log("ERROR: " + e);
 	}
-    
-
 });
 
 client.on('data', function(data) {
@@ -38,6 +36,8 @@ client.on('data', function(data) {
 });
 
 function getCommand(commandStr) {
+	let c = new Command();
+
 	if (commandStr.length == 0) {
 		throw "No command provided";
 	}
@@ -45,30 +45,17 @@ function getCommand(commandStr) {
 	var isIrcCommand = commandStr.indexOf("/") === 0;
 
 	if (isIrcCommand) {
-	
-		var parts = parseIrcCommand(commandStr).split(" ");
-
-		return parts[0].toUpperCase();
-
+		return c.parseCommandPart(commandStr);
 	} else {
 		return commandStr;
 	}
 }
 
-function parseIrcCommand(commandStr) {
-	return commandStr.substring(1, commandStr.length);
-}
-
-function parseIrcMessage(commandStr) {
-	var command = parseIrcCommand(commandStr).split(" ")[0];
-	var message = commandStr.substring(command.length + 2, commandStr.length);
-
-	return message;
-}
-
 function connect() {
 	client.connect(6667, '127.0.0.1', function() {
 		console.log('Connected');
+
+		sendNick('/NICK jme2');
 	});
 }
 
@@ -84,23 +71,20 @@ function write(str) {
 
 // actual irc commands to be sent
 function sendNick(cmd) {
-	var nick = parseIrcMessage(cmd);
-	var str = 'NICK ' + nick;
-	write(str);
-	sendUser(nick);
+	let uc = CommandFactory.create('NICK');
+	let nickCmd = uc.create(cmd);
+	write(nickCmd);
+	sendUser(uc.parseMessagePart(cmd));
 }
 
 function sendUser(nick) {
-	var str = "USER " + nick + " 8 * :My real name";
+	let uc = CommandFactory.create('USER');
 	
-	write(str);
+	write(uc.create(nick));
 }
 
 function sendJoin(cmd) {
-	var channel = parseIrcMessage(cmd);
-	var str = "JOIN " + channel;
+	let jc = CommandFactory.create('JOIN');
 
-	write(str);
+	write(jc.create(cmd));
 }
-
-

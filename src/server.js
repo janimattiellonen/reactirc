@@ -26,6 +26,7 @@ app.get('/api/irc', function(req, res, next) {
     });
 });
 
+
 app.get('*', function(req, res, next) {
   res.sendFile(path.join(__dirname, '/../web/index.dev.html'));
 });
