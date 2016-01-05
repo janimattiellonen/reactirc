@@ -7,7 +7,7 @@ var util = require('util');
 //var net = require('net');
 
 import net from 'net';
-import {CommandFactory, Command} from './components/domain/Command';
+import {CommandFactory, Command, ReplyFactory, Reply} from './components/domain/Command';
 
 var client = new net.Socket();
 var connected = false;
@@ -16,6 +16,7 @@ process.stdin.on('data', function (input) {
 	try {
 		input = input.replace(/\r?\n|\r/g,"");
 		let command = getCommand(input);
+		console.log("cc:" + command + ":");
 
 	    if (command == 'connect') {
 	    	connect();	
@@ -25,6 +26,9 @@ process.stdin.on('data', function (input) {
 	    	sendNick(input);
 	    } else if (command == "quit") {
 	    	done();
+	    } else if (input.indexOf("=") === 0) {
+	    	// we are simulating server messages
+	    	handleServerData(input.substring(1, input.length));
 	    }
 	} catch (e) {
 		console.log("ERROR: " + e);
@@ -33,7 +37,44 @@ process.stdin.on('data', function (input) {
 
 client.on('data', function(data) {
 	console.log("FROM SERVER: " + data);
+	// PING :irc.example.net
+
+
+	// message types that the server sends to the client:
+	// 1) message from another user (private message)
+	// 2) message from a user to a channel the client has joined
+	// 3) notices
+	// 
+
+	handleServerData(data);
 });
+
+function handleServerData(data) {
+	let command = getServerMessageType(data);
+
+	if (null != command) {
+		let cmdStr = command.create(data);
+
+		write(cmdStr);
+	}
+}
+
+function getServerMessageType(str) {
+	console.log("88: " + str);
+	if (null == str || str.length === 0) {
+		throw "Received no data from server";
+	}
+
+	let isServerMessage = str.indexOf(':') === 0;
+
+	if (isServerMessage) {
+		return null;
+	} else {
+ 		let command = new Command();
+ 		console.log("99");
+ 		return ReplyFactory.create(command.parseCommandPart(str));
+	}
+}
 
 function getCommand(commandStr) {
 	let c = new Command();

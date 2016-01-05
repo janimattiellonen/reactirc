@@ -1,8 +1,10 @@
 export class Command {
 	
 	parseCommandPart(str) {
+		console.log("parseCommandPart:" + str + ":");
 		str = str.trim();
-		str = str.substring(1, str.length);
+
+		str = str.substring(str.indexOf("/") === 0 ? 1 : 0, str.length);
 
 		let pos = str.indexOf(' ');
 
@@ -59,5 +61,29 @@ export class JoinCommand extends Command {
 		let join = 'JOIN ' + this.parseMessagePart(str);
 
 		return join;
+	}
+}
+
+// Reply stuff
+
+export class ReplyFactory {
+	static create(type) {
+		switch (type) {
+			case 'PING':
+				return new PongReply();
+			default:
+				throw "Unknown reply: " + type;
+
+		}
+	}
+}
+
+export class Reply extends Command {
+
+}
+
+export class PongReply extends Reply {
+	create(str) {
+		return 'PONG ' + this.parseMessagePart(str);
 	}
 }
