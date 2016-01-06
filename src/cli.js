@@ -4,17 +4,18 @@ process.stdin.resume();
 process.stdin.setEncoding('utf8');
 var util = require('util');
 
-//var net = require('net');
-
 import net from 'net';
 import {CommandFactory, Command, ReplyFactory, Reply} from './components/domain/Command';
 
 var client = new net.Socket();
 var connected = false;
+let receivedData = "";
+
 
 process.stdin.on('data', function (input) {
 	try {
 		input = input.replace(/\r?\n|\r/g,"");
+
 		let command = getCommand(input);
 		console.log("cc:" + command + ":");
 
@@ -36,7 +37,8 @@ process.stdin.on('data', function (input) {
 });
 
 client.on('data', function(data) {
-	console.log("FROM SERVER: " + data);
+	console.log("FROM SERVER: " + data.toString().trim() + "|");
+	handleServerData(data.toString());
 	// PING :irc.example.net
 
 
@@ -46,15 +48,20 @@ client.on('data', function(data) {
 	// 3) notices
 	// 
 
-	handleServerData(data);
+	
 });
+
+client.on('end', function() {
+	console.log("=============Received rest from server...");
+	//handleServerData(receivedData);
+})
 
 function handleServerData(data) {
 	let command = getServerMessageType(data);
 
 	if (null != command) {
 		let cmdStr = command.create(data);
-
+		console.log("ppp: " + cmdStr);
 		write(cmdStr);
 	}
 }

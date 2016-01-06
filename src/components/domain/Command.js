@@ -1,7 +1,7 @@
 export class Command {
 	
 	parseCommandPart(str) {
-		console.log("parseCommandPart:" + str + ":");
+		console.log("parseCommandPart:" + str + "|");
 		str = str.trim();
 
 		str = str.substring(str.indexOf("/") === 0 ? 1 : 0, str.length);
@@ -16,14 +16,19 @@ export class Command {
 	}
 
 	parseMessagePart(str) {
+		console.log("parseMessagePart:" + str + "|");
 		let commandPart = this.parseCommandPart(str);
+		console.log("parseMessagePart2:" + commandPart + "|");
 		let pos = str.indexOf(' ');
 
 		if (pos === -1) {
 			return null;
 		}
 
-		return str.substring(commandPart.length + 2, str.length);
+		let m = str.substring(commandPart.length + 1, str.length);
+
+		console.log("mm:" + m + "|");
+		return m;
 	}
 }
 
@@ -84,6 +89,7 @@ export class Reply extends Command {
 
 export class PongReply extends Reply {
 	create(str) {
+		console.log("Creating PONG: " + str + "|");
 		return 'PONG ' + this.parseMessagePart(str);
 	}
 }

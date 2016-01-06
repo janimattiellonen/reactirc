@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import ReactIrcApp from '../ReactIrcApp';
+import IrcApp from '../IrcApp';
 
 function mapStateToProps(state) {
     return {
@@ -15,4 +15,4 @@ function mapDispatchToProps(dispatch) {
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(ReactIrcApp);
+)(IrcApp);

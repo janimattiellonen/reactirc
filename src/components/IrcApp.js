@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default class ReactIrcApp extends React.Component {
+export default class IrcApp extends React.Component {
 
     render() {
 
