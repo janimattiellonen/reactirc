@@ -6,14 +6,19 @@ import webpack from 'webpack';
 
 import config from '../webpack.config';
 import bodyParser from 'body-parser';
-
-
+import net from 'net';
 const app = express();
 var http = require('http').Server(app);
 const compiler = webpack(config);
 const port = 8888;
 
 var io = require('socket.io')(http);
+
+import IrcService from './services/ircService';
+
+let client = new net.Socket()
+
+let ircService = new IrcService(client);
 
 app.use(require('webpack-dev-middleware')(compiler, {
   noInfo: false,
@@ -59,5 +64,10 @@ io.on('connection', function(socket){
 
     socket.on('app-command', function(message) {
         console.log('app-command: ' + message);
+
+        if (message == 'connect') {
+            console.log("Connecting to irc...");
+            ircService.connect();
+        }
     });
 });
