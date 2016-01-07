@@ -35,7 +35,6 @@ app.get('/api/irc', function(req, res, next) {
     });
 });
 
-
 app.get('*', function(req, res, next) {
   res.sendFile(path.join(__dirname, '/../web/index.dev.html'));
 });
@@ -60,6 +59,7 @@ io.on('connection', function(socket){
 
     socket.on('message', function(message) {
         console.log("Message from user: " + message);
+        ircService.processInput(message);
     });
 
     socket.on('app-command', function(message) {
