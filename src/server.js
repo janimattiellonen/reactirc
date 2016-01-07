@@ -18,7 +18,7 @@ import IrcService from './services/ircService';
 
 let client = new net.Socket()
 
-let ircService = new IrcService(client);
+let ircService = new IrcService(client, io);
 
 app.use(require('webpack-dev-middleware')(compiler, {
   noInfo: false,

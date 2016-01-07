@@ -7,12 +7,12 @@ import InputPanel from './InputPanel';
 
 const IndexPage = props => {
 
-	const {connectToIrc, sendMessage} = props;
+	const {connectToIrc, sendMessage, messages} = props;
 
     return (	
         <div className="component">
             <Button onClick={connectToIrc}>Connect</Button>
-        	<Window />
+        	<Window messages={messages} />
         	<InputPanel onSendMessage={sendMessage}/>
             <UserPanel />
 

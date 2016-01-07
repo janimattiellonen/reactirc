@@ -4,7 +4,7 @@ import {connectToIrc, initIoConnection, sendMessage} from '../../actions/irc-act
 
 function mapStateToProps(state) {
     return {
-       
+       messages: state.irc.messages
     }
 }
 

@@ -2,8 +2,9 @@ import {CommandFactory, Command, ReplyFactory, Reply} from '../components/domain
 
 export default class IrcService {
 
-	constructor(socket) {
+	constructor(socket, io) {
 		this.socket = socket;
+		this.io 	= io;
 	}
 
 	connect() {
@@ -17,6 +18,7 @@ export default class IrcService {
 		this.socket.on('data', (data) => {
 			console.log("FROM SERVER: " + data.toString().trim() + "|");
 			this.handleServerData(data.toString());
+			this.io.emit('server-message', data.toString());
 			// PING :irc.example.net
 			// message types that the server sends to the client:
 			// 1) message from another user (private message)

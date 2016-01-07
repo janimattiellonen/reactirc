@@ -3,10 +3,31 @@ import { List } from 'immutable';
 import io from 'socket.io-client';
 
 export const INIT_CONNECTION = 'INIT_CONNECTION';
+export const RECEIVE_MESSAGE = 'RECEIVE_MESSAGE';
 
 export function initIoConnection() {
-	console.log("initIoConnection");
-	let socket = io('http://localhost:8888');
+	return function(dispatch, getState) {
+		console.log("initIoConnection");
+		let socket = io('http://localhost:8888');
+
+		socket.on('server-message', (data) => {
+			console.log("Server responded with: " + data);
+
+			dispatch(receiveMessage(data));
+		});
+
+		dispatch(init(socket));
+	}
+
+/*
+	return {
+		type: INIT_CONNECTION,
+		payload: socket
+	}
+*/
+}
+
+export function init(socket) {
 	return {
 		type: INIT_CONNECTION,
 		payload: socket
@@ -29,3 +50,9 @@ export function sendMessage(message) {
     };
 }
 
+export function receiveMessage(message) {
+	return {
+		type: RECEIVE_MESSAGE,
+		payload: message
+	}
+}

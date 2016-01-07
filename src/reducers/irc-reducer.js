@@ -1,15 +1,17 @@
-import { List, Map } from 'immutable';
+import { List, Map, OrderedSet} from 'immutable';
 import uuid from 'node-uuid';
 
 console.log("loading irc-reducers");
 
 import {
-	INIT_CONNECTION
+	INIT_CONNECTION,
+    RECEIVE_MESSAGE
 } from '../actions/irc-actions';
 
-const defaultState = Map({
-    io: null
-});
+const defaultState = {
+    io: null,
+    messages: OrderedSet()
+};
 
 export default function(state = defaultState, action) {
 	console.log("type: " + action.type)
@@ -22,6 +24,12 @@ export default function(state = defaultState, action) {
                 io: action.payload
             }
     		break;
+        case RECEIVE_MESSAGE:
+                return {
+                    ...state,
+                    messages: state.messages.add(action.payload)
+                }
+            break;
         default:
             return state;
 
