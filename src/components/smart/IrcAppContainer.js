@@ -1,5 +1,6 @@
 import { connect } from 'react-redux';
 import IrcApp from '../IrcApp';
+import {initIoConnection, sendMessage} from '../../actions/irc-actions';
 
 function mapStateToProps(state) {
     return {
@@ -9,6 +10,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
+    	initIoConnection: () => dispatch(initIoConnection()),
+    	sendMessage: (message) => dispatch(sendMessage(message))
     };
 }
 

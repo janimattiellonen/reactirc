@@ -5,16 +5,10 @@ export default class InputPanel extends React.Component {
 
     constructor(props) {
         super(props);
-
-        this.state = {
-            socket: null
-        }
     }
 
     componentDidMount() {
-        this.setState({
-            socket: io('http://localhost:8888')
-        });
+
     }
 
     render() {
@@ -31,7 +25,7 @@ export default class InputPanel extends React.Component {
             let message = e.target.value;
 
             if (message.length > 0) {
-                this.state.socket.emit('message', message);
+                this.props.onSendMessage(message);
                 e.target.value = "";    
             }
         }
