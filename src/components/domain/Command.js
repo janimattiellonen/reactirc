@@ -1,35 +1,10 @@
+import MessageParser from './MessageParser';
+
 export class Command {
-	
-	parseCommandPart(str) {
-		console.log("parseCommandPart:" + str + "|");
-		str = str.trim();
-
-		str = str.substring(str.indexOf("/") === 0 ? 1 : 0, str.length);
-
-		let pos = str.indexOf(' ');
-
-		if (pos === -1) {
-			return str;
-		}
-
-		return str.substring(0, pos);
+	constructor() {
+		this.parser = new MessageParser();
 	}
 
-	parseMessagePart(str) {
-		console.log("parseMessagePart:" + str + "|");
-		let commandPart = this.parseCommandPart(str);
-		console.log("parseMessagePart2:" + commandPart + "|");
-		let pos = str.indexOf(' ');
-
-		if (pos === -1) {
-			return null;
-		}
-
-		let m = str.substring(commandPart.length + 1, str.length);
-
-		console.log("mm:" + m + "|");
-		return m;
-	}
 }
 
 export class CommandFactory {
@@ -49,7 +24,7 @@ export class CommandFactory {
 
 export class NickCommand extends Command {
 	create(str) {
-		let nick = 'NICK ' + this.parseMessagePart(str);
+		let nick = 'NICK ' + this.parser.parseMessagePart(str);
 
 		return nick;
 	}
@@ -63,7 +38,7 @@ export class UserCommand extends Command {
 
 export class JoinCommand extends Command {
 	create(str) {
-		let join = 'JOIN ' + this.parseMessagePart(str);
+		let join = 'JOIN ' + this.parser.parseMessagePart(str);
 
 		return join;
 	}
@@ -90,6 +65,6 @@ export class Reply extends Command {
 export class PongReply extends Reply {
 	create(str) {
 		console.log("Creating PONG: " + str + "|");
-		return 'PONG ' + this.parseMessagePart(str);
+		return 'PONG ' + this.parser.parseMessagePart(str);
 	}
 }

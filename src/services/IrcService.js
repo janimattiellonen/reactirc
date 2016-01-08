@@ -1,10 +1,17 @@
 import {CommandFactory, Command, ReplyFactory, Reply} from '../components/domain/Command';
+import MessageParser from '../components/domain/MessageParser';
+
+import * as IrcConstants from '../components/domain/constants';
+
+import {List} from 'immutable';
 
 export default class IrcService {
 
 	constructor(socket, io) {
-		this.socket = socket;
-		this.io 	= io;
+		this.socket 	= socket;
+		this.io 		= io;
+		this.parser 	= new MessageParser();
+		this.command 	= new Command();
 	}
 
 	connect() {
@@ -17,14 +24,31 @@ export default class IrcService {
 
 		this.socket.on('data', (data) => {
 			console.log("FROM SERVER: " + data.toString().trim() + "|");
-			this.handleServerData(data.toString());
-			this.io.emit('server-message', data.toString());
+
+			data = data.toString().trim();
+
+			let messages = List(data.match(/[^\r\n]+/g));
+
+			console.log("messages length: " + messages.length);
+
+			console.log("messages: " + messages);
+
+			messages.filter(m => m != null).map(message => this.handleServerData(message));
+
+		
+
+		
+
+			//this.handleServerData(data.toString());
+			//this.io.emit('server-message', data.toString());
 			// PING :irc.example.net
 			// message types that the server sends to the client:
 			// 1) message from another user (private message)
 			// 2) message from a user to a channel the client has joined
-			// 3) notices
-			// 
+			// 3) action done by another user:
+			// 		:jme!~jme@localhost TOPIC #foo :Mah topic 	
+			// 4) action done by the server
+			// 		:irc.example.net 001 jme2 :Welcome to the Internet Relay Network jme2!~jme2@localhost :irc.example.Network
 		});
 	}
 
@@ -50,7 +74,40 @@ export default class IrcService {
 		}
 	}
 
-	handleServerData(data) {
+	handleServerData(str) {
+		if (str == null || str == undefined) {
+			return;
+		}
+
+		console.log('handleServerData:' + str + '|')
+		if (this.parser.isServerCommand(str)) {
+			// PING :irc.example.net
+			let cmdStr = ReplyFactory.create(this.parser.parseCommandPart(str)).create(str);
+			this.write(cmdStr);
+		} else if (this.parser.isServerMessage(str)) {
+			// :irc.example.net 001 jme2 :Welcome to the Internet Relay Network jme2!~jme2@localhost :irc.example.net
+			let serverMessageObjMock = {
+				prefix: 'irc.example.net',
+				replyNumber: '001',
+				receiver: 'jme2', // may be a channel too (#foo)
+				message: 'Welcome to the Internet Relay Network jme2!~jme2@localhost :irc.example.net'
+			};
+
+			let serverMessageObj = this.parser.parseServerMessage(str);
+
+			this.io.emit('server-message', serverMessageObj.message);
+
+
+		} else if (this.parser.isUserMessage(str)) {
+			// :jme!~jme@localhost TOPIC #foo :Mah topic 
+		} else if (this.parser.isUserPrivateMessage(str)) {
+			// :jme!~jme@localhost PRIVMSG jme2 :Hey
+		}
+
+		// this.io.emit('server-message', data.toString());
+
+/*
+
 		let command = this.getServerMessageType(data);
 
 		if (null != command) {
@@ -58,22 +115,34 @@ export default class IrcService {
 			console.log("ppp: " + cmdStr);
 			this.write(cmdStr);
 		}
+*/
 	}
 
 	getServerMessageType(str) {
+		let command = new Command();
 		console.log("88: " + str);
+
 		if (null == str || str.length === 0) {
 			throw "Received no data from server";
 		}
 
-		let isServerMessage = str.indexOf(':') === 0;
+		let isMessage = str.indexOf(':') === 0;
 
-		if (isServerMessage) {
+		if (isMessage) {
+
+			let hasUserPrefix = this.parser.hasUserPrefix(str);
+
+
+			// :irc.example.net 001 jme2 :Welcome to the Internet Relay Network jme2!~jme2@localhost :irc.example.net
+			// :jme!~jme@localhost TOPIC #foo :Mah topic 
+
+
+
 			return null;
 		} else {
-	 		let command = new Command();
+	 		
 	 		console.log("99");
-	 		return ReplyFactory.create(command.parseCommandPart(str));
+	 		return ReplyFactory.create(this.parser.parseCommandPart(str));
 		}
 	}
 
@@ -87,7 +156,7 @@ export default class IrcService {
 		var isIrcCommand = commandStr.indexOf("/") === 0;
 
 		if (isIrcCommand) {
-			return c.parseCommandPart(commandStr);
+			return this.parser.parseCommandPart(commandStr);
 		} else {
 			return commandStr;
 		}
@@ -97,7 +166,7 @@ export default class IrcService {
 		let uc = CommandFactory.create('NICK');
 		let nickCmd = uc.create(cmd);
 		this.write(nickCmd);
-		this.sendUser(uc.parseMessagePart(cmd));
+		this.sendUser(this.parser.parseMessagePart(cmd));
 	}
 
 	sendUser(nick) {
