@@ -7,15 +7,18 @@ export default class ButtonPanel extends React.Component {
 
     render() {
 
+        const {channels} = this.props;
+
         return (
             <div className="button-panel">
                 {this.props.children}
 
                 <ButtonGroup>
-                    <Button onClick={this.onClick.bind(null, 'macintosh.fi')}>#macintosh.fi</Button>
-                    <Button onClick={this.onClick.bind(null, 'mureakuha')}>#mureakuha</Button>
-                    <Button onClick={this.onClick.bind(null, 'php.fi')}>#php.fi</Button>
-                    <Button onClick={this.onClick.bind(null, 'frisbeegolf')}>#frisbeegolf</Button>
+                    {channels.map(channel => {
+                        return (
+                            <Button onClick={this.onClick.bind(null, channel.name)}>{channel.name}</Button>
+                        )
+                    })}
                 </ButtonGroup>
 
             </div>

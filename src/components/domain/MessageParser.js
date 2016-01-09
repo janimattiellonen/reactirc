@@ -16,6 +16,20 @@ export default class MessageParser {
 		return false;
 	}
 
+	getReplyNumber(str) {
+		if (!this.isServerMessage(str)) {
+			throw "Expected a server message. Got something else";
+		}
+
+		let parts = str.split(' ');
+
+		if (parts.length < 2) {
+			throw "Not enough parameters";
+		}
+
+		return parts[1];
+	}
+
 	isUserMessage(str) {
 		console.log('isUserMessage:' + str + '|');
 		return !this.isServerCommand(str) && !this.isServerMessage(str);
@@ -80,8 +94,7 @@ export default class MessageParser {
 		return m;
 	}
 
-	parseServerMessage(str) {
-
+	parseServerFirstResponseMessage(str) {
 		if (!this.isServerMessage(str)) {
 			throw 'Not a server message: ' + str
 		}
@@ -110,6 +123,23 @@ export default class MessageParser {
 		// :irc.example.net 001 jme2 :Welcome to the Internet Relay Network jme2!~jme2@localhost
 
 		return serverMessageObj;
+	}
+
+	parseChannelTopic(str) {
+		// :irc.example.net 332 jme2 #foo :Mah topic
+		str = this.removeMessageIndicator(str);
+		let parts = str.split(' ');
+		let pos = parts[0].length + parts[1].length + parts[2].length + parts[3].length + 4;
+
+		let topic = {
+			prefix: parts[0],
+			replyNumber: parts[1],
+			receiver: parts[2],
+			channel: parts[3],
+			topic: str.substring(pos - 1, str.length)
+		};
+
+		return topic;
 	}
 
 	removeMessageIndicator(str) {

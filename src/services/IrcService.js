@@ -86,36 +86,35 @@ export default class IrcService {
 			this.write(cmdStr);
 		} else if (this.parser.isServerMessage(str)) {
 			// :irc.example.net 001 jme2 :Welcome to the Internet Relay Network jme2!~jme2@localhost :irc.example.net
-
-			let serverMessageObj = this.parser.parseServerMessage(str);
-
-			this.io.emit('server-message', serverMessageObj.message);
-
+			let serverMessageObj = this.parser.parseServerFirstResponseMessage(str);
+			this.io.emit('server-message', serverMessageObj.message); // 1
+			console.log("REPLY NUMBER: " + this.parser.getReplyNumber(str));
 			switch (this.parser.getReplyNumber(str)) {
-				case RPL_WELCOME: 		// 001
-				case RPL_YOURHOST: 		// 002
-				case RPL_CREATED: 		// 003
-				case RPL_MYINFO: 		// 004
-				case RPL_BOUNCE: 		// 005
-					let serverMessageObj = this.parser.parseServerMessage(str);
-					this.io.emit('server-message', serverMessageObj.message);
+				case IrcConstants.RPL_WELCOME: 		// 001
+				case IrcConstants.RPL_YOURHOST: 	// 002
+				case IrcConstants.RPL_CREATED: 		// 003
+				case IrcConstants.RPL_MYINFO: 		// 004
+				case IrcConstants.RPL_BOUNCE: 		// 005s
+					this.io.emit('server-message', serverMessageObj.message); // 2
 					break;
-				case RPL_TOPIC: 		// 332
+				case IrcConstants.RPL_TOPIC: 		// 332
+
+					let info = this.parser.parseChannelTopic(str);
 					// :irc.example.net 332 jme2 #foo :Mah topic
 					// example of how data could be sent
 					// may need to serialize object as JSON
 					this.io.emit('channel-topic', {
-						channel: '#foo',
-						topic: 'Mah topic'
+						name: info.name,
+						topic: info.topic
 					});
 					break;
-				case TOPICWHOTIME: 		// 333
+				case IrcConstants.TOPICWHOTIME: 		// 333
 					// :irc.example.net 333 jme2 #foo jme 1452279802
 					break;
-				case RPL_NAMREPLY: 		// 353
+				case IrcConstants.RPL_NAMREPLY: 		// 353
 					// :irc.example.net 353 jme2 = #foo :jme2 @jme
 					break;
-				case RPL_ENDOFNAMES: 	// 366
+				case IrcConstants.RPL_ENDOFNAMES: 	// 366
 					// :irc.example.net 366 jme2 #foo :End of NAMES list
 					break;
 				default:
