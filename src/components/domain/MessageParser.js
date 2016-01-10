@@ -1,3 +1,5 @@
+import {List} from 'immutable';
+
 export default class MessageParser {
 
 	isServerCommand(str) {
@@ -140,6 +142,29 @@ export default class MessageParser {
 		};
 
 		return topic;
+	}
+
+	parseUserList(str) {
+		// :irc.example.net 353 jme2 = #foo :jme2 @jme
+		str = this.removeMessageIndicator(str);
+
+		let parts = str.split(' ');
+
+		let users = List(str.substring(str.indexOf(':') + 1, str.length).split(' ')).map(user => {
+			return {
+				op: user.indexOf('@') === 0,
+				nick: user.replace('@', '')
+			};
+		}).toList();
+
+		let info = {
+			prefix: parts[0],
+			replyNumber: parts[1],
+			channel: str.substring(str.indexOf('#'), str.indexOf(' ', str.indexOf('#'))),
+			users: users
+		};	
+
+		return info;	
 	}
 
 	removeMessageIndicator(str) {

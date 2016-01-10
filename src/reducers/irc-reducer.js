@@ -1,20 +1,25 @@
-import { List, Map, OrderedSet} from 'immutable';
+import { List, Map} from 'immutable';
 import uuid from 'node-uuid';
+import moment from 'moment';
 
 console.log("loading irc-reducers");
 
 import {
 	INIT_CONNECTION,
+    SET_CONNECTED,
     RECEIVE_MESSAGE,
     OPEN_NEW_CHANNEL,
-    SET_CHANNEL_TOPIC
+    SET_CHANNEL_TOPIC,
+    SET_CHANNEL_USERS
 } from '../actions/irc-actions';
 
 const defaultState = {
     io: null,
-    messages: OrderedSet(),
+    messages: List(),
     channels: Map(),
-    activeChannel: null
+    users: List(),
+    activeChannel: null,
+    connected: false
 };
 
 
@@ -29,10 +34,20 @@ export default function(state = defaultState, action) {
                 io: action.payload
             }
     		break;
+        case SET_CONNECTED: 
+            console.log("===== " + action.payload);
+            return {
+                ...state,
+                connected: action.payload
+            }
+            break;
         case RECEIVE_MESSAGE:
             return {
                 ...state,
-                messages: state.messages.add(action.payload)
+                messages: state.messages.push({
+                    message: action.payload,
+                    timestamp: moment().valueOf()
+                })
             }
             break;
         case OPEN_NEW_CHANNEL:
@@ -44,8 +59,8 @@ export default function(state = defaultState, action) {
             break;
         case SET_CHANNEL_TOPIC: 
 
-            let channel;
-            let channels = state.channels;
+            var channel = null;
+            var channels = state.channels;
             console.log("SET_CHANNEL_TOPIC: " + JSON.stringify(action.payload));
             if (!channels.has(action.payload.name)) {
                 console.log("No entry for " + action.payload.name);
@@ -66,7 +81,28 @@ export default function(state = defaultState, action) {
                 channels: channels
             }
             break;
+        case SET_CHANNEL_USERS: 
+            var channel = null;
+            var channels = state.channels;
+
+            if (!channels.has(action.payload.channel)) {
+                console.log("No entry for " + action.payload.channel);
+                channel = {
+                    name: action.payload.channel,
+                    users: action.payload.users
+                }
+            }
+
+            channels = channels.set(action.payload.channel, channel);
+
+            return {
+                ...state,
+                channels: channels,
+                users: List(action.payload.users)
+            }
+            break;
         default:
+            console.log("RETURNING default state: " + JSON.stringify(state));
             return state;
 
     }

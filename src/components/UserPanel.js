@@ -5,18 +5,29 @@ export default class UserPanel extends React.Component {
 
     render() {
 
+        const {users} = this.props;
+        
         return (
             <div className="user-panel">
                 <div className="">
 
                     <ul>
-                        <li>@Fallerii</li>
-                        <li>jeissys</li>
-                        <li>jme</li>
-                        <li>Ozma</li>
+                        {users.map(user => {
+                            return (
+                                <li>{this.renderUser(user)}</li>
+                            )
+                        })}
                     </ul>
                 </div>
             </div>
         );
+    }
+
+    renderUser(user) {
+        if (null == user) {
+            return null;
+        }
+
+        return (user.op ? '@' : '') + user.nick;
     }
 }

@@ -16,9 +16,9 @@ var io = require('socket.io')(http);
 
 import IrcService from './services/ircService';
 
-let client = new net.Socket()
+let client = null;
 
-let ircService = new IrcService(client, io);
+let ircService = null;
 
 app.use(require('webpack-dev-middleware')(compiler, {
   noInfo: false,
@@ -66,6 +66,8 @@ io.on('connection', function(socket){
         console.log('app-command: ' + message);
 
         if (message == 'connect') {
+            client = new net.Socket();
+            ircService = new IrcService(client, io);
             console.log("Connecting to irc...");
             ircService.connect();
         }

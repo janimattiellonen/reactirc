@@ -12,14 +12,17 @@ export default class IndexPage extends React.Component {
     }
 
     render() {
-        const {connectToIrc, sendMessage, messages, channels} = this.props;
+        const {connectToIrc, sendMessage, messages, channels, connected, users} = this.props;
+
+        console.log("channels A: " + JSON.stringify(channels));
 
         return (    
             <div className="component">
-                <Button onClick={connectToIrc}>Connect</Button>
+                <h1>Connected: {connected}</h1>
+                <Button disabled={connected == true} onClick={connectToIrc}>Connect</Button>
                 <Window messages={messages} />
                 <InputPanel onSendMessage={sendMessage}/>
-                <UserPanel />
+                <UserPanel users={users}/>
 
                 <ButtonPanel channels={channels}/>
             </div>

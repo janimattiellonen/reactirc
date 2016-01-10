@@ -16,10 +16,14 @@ export default class IrcService {
 
 	connect() {
 
+		this.socket.on('uncaughtException', (err) => {
+			console.log("UNCAUGHT EXCEPTION: " + err);
+		});
+
 		this.socket.connect(6667, '127.0.0.1', () => {
 			console.log('Connected');
 
-			this.sendNick('/NICK jme2');
+			this.sendNick('/NICK jme2' + (Math.floor(Math.random() * (100 - 3)) + 100));
 		});
 
 		this.socket.on('data', (data) => {
@@ -50,6 +54,8 @@ export default class IrcService {
 			// 4) action done by the server
 			// 		:irc.example.net 001 jme2 :Welcome to the Internet Relay Network jme2!~jme2@localhost :irc.example.Network
 		});
+
+
 	}
 
 	processInput(input) {
@@ -113,6 +119,11 @@ export default class IrcService {
 					break;
 				case IrcConstants.RPL_NAMREPLY: 		// 353
 					// :irc.example.net 353 jme2 = #foo :jme2 @jme
+					let userList = this.parser.parseUserList(str);
+
+					console.log("parsing user list: " + JSON.stringify(userList));
+
+					this.io.emit('channel-users', userList);
 					break;
 				case IrcConstants.RPL_ENDOFNAMES: 	// 366
 					// :irc.example.net 366 jme2 #foo :End of NAMES list
@@ -131,6 +142,7 @@ export default class IrcService {
 			*/
 
 		} else if (this.parser.isUserMessage(str)) {
+			this.io.emit('server-message', str); 
 			// :jme!~jme@localhost TOPIC #foo :Mah topic 
 		} else if (this.parser.isUserPrivateMessage(str)) {
 			// :jme!~jme@localhost PRIVMSG jme2 :Hey

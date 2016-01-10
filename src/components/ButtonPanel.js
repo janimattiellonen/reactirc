@@ -1,7 +1,6 @@
 import React from 'react';
 import {Button, ButtonGroup} from 'react-bootstrap';
 import io from 'socket.io-client';
-//import IrcButton from './IrcButton';
 
 export default class ButtonPanel extends React.Component {
 
@@ -14,9 +13,9 @@ export default class ButtonPanel extends React.Component {
                 {this.props.children}
 
                 <ButtonGroup>
-                    {channels.map(channel => {
+                    {channels.map((channel, i) => {
                         return (
-                            <Button onClick={this.onClick.bind(null, channel.name)}>{channel.name}</Button>
+                            <Button key={i} onClick={this.onClick.bind(null, channel.name)}>{channel.name}</Button>
                         )
                     })}
                 </ButtonGroup>
