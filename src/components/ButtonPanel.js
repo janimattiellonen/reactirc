@@ -13,6 +13,7 @@ export default class ButtonPanel extends React.Component {
                 {this.props.children}
 
                 <ButtonGroup>
+                    <Button key="status-button">Info</Button>
                     {channels.map((channel, i) => {
                         return (
                             <Button key={i} onClick={this.onClick.bind(null, channel.name)}>{channel.name}</Button>
@@ -29,8 +30,6 @@ export default class ButtonPanel extends React.Component {
     }
 
     onClick(id) {
-        var socket = io('http://localhost:8888');
-
-        socket.emit('message', 'hello from ' + id);
+        
     }
 }
