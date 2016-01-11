@@ -2,6 +2,10 @@ import {List} from 'immutable';
 
 export default class MessageParser {
 
+	isUserCommand(str) {
+		return str.indexOf('/') == 0;
+	}
+	
 	isServerCommand(str) {
 		console.log('isServerCommand:' + str + '|');
 		return !this.hasPrefix(str);

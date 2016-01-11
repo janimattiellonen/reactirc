@@ -62,22 +62,30 @@ export default class IrcService {
 		try {
 			input = input.replace(/\r?\n|\r/g,"");
 
-			let command = this.getCommand(input);
-			console.log("cc:" + command + ":");
+			// begins with a '/'
+			if (this.parser.isUserCommand(input)) {
+				let command = this.parser.parseCommandPart(input);
+				console.log("command:" + command + ":");
 
-		    if (command == "JOIN") {
-		    	this.sendJoin(input);
-			} else if (command == "NICK") {
-		    	this.sendNick(input);
-		    } else if (command == "quit") {
-		    	// not yet implemented
-		    } else if (input.indexOf("=") === 0) {
-		    	// we are simulating server messages
-		    	this.handleServerData(input.substring(1, input.length));
-		    }
+				let func = this.createUserCommand(command);
+
+				if (typeof this[func] == 'function') {
+					this[func](input);
+				} else {
+					// we don't know how to process this
+					console.log('Unknown command: ' + command)
+				}
+			} else {
+				// a normal message either to a user or to a channel
+				console.log("User message. NOT SUPPORTED YET: " + input);
+			}
 		} catch (e) {
 			console.log("ERROR: " + e);
 		}
+	}
+
+	createUserCommand(command) {
+		return 'send' + command.toLowerCase().charAt(0).toUpperCase() + command.toLowerCase().slice(1);
 	}
 
 	handleServerData(str) {
@@ -149,63 +157,17 @@ export default class IrcService {
 		}
 
 		// this.io.emit('server-message', data.toString());
-
-/*
-
-		let command = this.getServerMessageType(data);
-
-		if (null != command) {
-			let cmdStr = command.create(data);
-			console.log("ppp: " + cmdStr);
-			this.write(cmdStr);
-		}
-*/
 	}
 
-	getServerMessageType(str) {
-		let command = new Command();
-		console.log("88: " + str);
-
-		if (null == str || str.length === 0) {
-			throw "Received no data from server";
-		}
-
-		let isMessage = str.indexOf(':') === 0;
-
-		if (isMessage) {
-
-			let hasUserPrefix = this.parser.hasUserPrefix(str);
-
-
-			// :irc.example.net 001 jme2 :Welcome to the Internet Relay Network jme2!~jme2@localhost :irc.example.net
-			// :jme!~jme@localhost TOPIC #foo :Mah topic 
-
-
-
-			return null;
-		} else {
-	 		
-	 		console.log("99");
-	 		return ReplyFactory.create(this.parser.parseCommandPart(str));
-		}
+	write(str) {
+		console.log("IrcService::write():" + str + "|");
+		this.socket.write(str + "\r\n");
 	}
 
-	getCommand(commandStr) {
-		let c = new Command();
-
-		if (commandStr.length == 0) {
-			throw "No command provided";
-		}
-
-		var isIrcCommand = commandStr.indexOf("/") === 0;
-
-		if (isIrcCommand) {
-			return this.parser.parseCommandPart(commandStr);
-		} else {
-			return commandStr;
-		}
-	}
-
+	// rest of methods below are mapped to user commands received from a client
+	// /JOIN ...
+	// /NICK ...
+	// etc
 	sendNick(cmd) {
 		let uc = CommandFactory.create('NICK');
 		let nickCmd = uc.create(cmd);
@@ -225,8 +187,5 @@ export default class IrcService {
 		this.write(jc.create(cmd));
 	}
 
-	write(str) {
-		console.log("IrcService::write():" + str + "|");
-		this.socket.write(str + "\r\n");
-	}
+
 }

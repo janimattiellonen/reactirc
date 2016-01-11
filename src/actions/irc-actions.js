@@ -2,13 +2,14 @@ import axios from 'axios';
 import { List } from 'immutable';
 import io from 'socket.io-client';
 
-export const INIT_CONNECTION 	= 'INIT_CONNECTION';
-export const SET_CONNECTED		= 'SET_CONNECTED';
-export const RECEIVE_MESSAGE 	= 'RECEIVE_MESSAGE';
+export const INIT_CONNECTION 		= 'INIT_CONNECTION';
+export const SET_CONNECTED			= 'SET_CONNECTED';
+export const RECEIVE_MESSAGE 		= 'RECEIVE_MESSAGE';
 
-export const OPEN_NEW_CHANNEL	= 'OPEN_NEW_CHANNEL';
-export const SET_CHANNEL_TOPIC	= 'SET_CHANNEL_TOPIC';
-export const SET_CHANNEL_USERS	= 'SET_CHANNEL_USERS';
+export const OPEN_NEW_CHANNEL		= 'OPEN_NEW_CHANNEL';
+export const SET_CHANNEL_TOPIC		= 'SET_CHANNEL_TOPIC';
+export const SET_CHANNEL_USERS		= 'SET_CHANNEL_USERS';
+export const SET_CURRENT_CHANNEL	= 'SET_CURRENT_CHANNEL';
 
 let socket = null;
 
@@ -38,9 +39,7 @@ export function initIoConnection() {
 
 			dispatch(init(socket));
 		} 
-
 	}
-
 }
 
 export function init(socket) {
@@ -65,6 +64,10 @@ export function connectToIrc() {
 
 		return dispatch(setConnected(true));
 	}
+}
+
+export function processMessage(message) {
+	return sendMessage(message);
 }
 
 export function sendMessage(message) {
@@ -92,5 +95,12 @@ export function setChannelUsers(data) {
 	return {
 		type: SET_CHANNEL_USERS,
 		payload: data
+	}
+}
+
+export function setCurrentChannel(channel) {
+	return {
+		type: SET_CURRENT_CHANNEL,
+		payload: channel
 	}
 }

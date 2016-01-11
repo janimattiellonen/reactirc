@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import IndexPage from '../IndexPage';
-import {connectToIrc, initIoConnection, sendMessage} from '../../actions/irc-actions';
+import {connectToIrc, initIoConnection, processMessage} from '../../actions/irc-actions';
 
 function mapStateToProps(state) {
     return {
@@ -14,7 +14,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
     	connectToIrc: () => dispatch(connectToIrc()),
-        sendMessage: (message) => dispatch(sendMessage(message))
+        processMessage: (message) => dispatch(processMessage(message))
     };
 }
 

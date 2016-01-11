@@ -16,7 +16,7 @@ export default class ButtonPanel extends React.Component {
                     <Button key="status-button">Info</Button>
                     {channels.map((channel, i) => {
                         return (
-                            <Button key={i} onClick={this.onClick.bind(null, channel.name)}>{channel.name}</Button>
+                            <Button key={i} onClick={this.onClick.bind(this, channel.name)}>{channel.name}</Button>
                         )
                     })}
                 </ButtonGroup>
@@ -30,6 +30,6 @@ export default class ButtonPanel extends React.Component {
     }
 
     onClick(id) {
-        
+
     }
 }
