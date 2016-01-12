@@ -114,11 +114,12 @@ export default class IrcService {
 				case IrcConstants.RPL_TOPIC: 		// 332
 
 					let info = this.parser.parseChannelTopic(str);
+					console.log("=====" + JSON.stringify(info));
 					// :irc.example.net 332 jme2 #foo :Mah topic
 					// example of how data could be sent
 					// may need to serialize object as JSON
 					this.io.emit('channel-topic', {
-						name: info.name,
+						name: info.channel,
 						topic: info.topic
 					});
 					break;

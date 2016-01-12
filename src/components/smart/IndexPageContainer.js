@@ -7,7 +7,8 @@ function mapStateToProps(state) {
        messages: state.irc.messages,
        channels: state.irc.channels,
        connected: state.irc.connected,
-       users: state.irc.users
+       users: state.irc.users,
+       topic: state.irc.topic
     }
 }
 

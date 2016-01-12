@@ -5,7 +5,7 @@ export default class MessageParser {
 	isUserCommand(str) {
 		return str.indexOf('/') == 0;
 	}
-	
+
 	isServerCommand(str) {
 		console.log('isServerCommand:' + str + '|');
 		return !this.hasPrefix(str);
@@ -142,7 +142,7 @@ export default class MessageParser {
 			replyNumber: parts[1],
 			receiver: parts[2],
 			channel: parts[3],
-			topic: str.substring(pos - 1, str.length)
+			topic: str.substring(pos + 1, str.length)
 		};
 
 		return topic;

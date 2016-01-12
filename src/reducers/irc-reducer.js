@@ -8,9 +8,10 @@ import {
 	INIT_CONNECTION,
     SET_CONNECTED,
     RECEIVE_MESSAGE,
-    OPEN_NEW_CHANNEL,
     SET_CHANNEL_TOPIC,
-    SET_CHANNEL_USERS
+    SET_CHANNEL_USERS,
+    SET_CURRENT_CHANNEL,
+    JOIN_CHANNEL
 } from '../actions/irc-actions';
 
 const defaultState = {
@@ -18,8 +19,9 @@ const defaultState = {
     messages: List(),
     channels: Map(),
     users: List(),
-    activeChannel: null,
-    connected: false
+    currentChannel: null,
+    connected: false,
+    topic: null
 };
 
 
@@ -27,15 +29,12 @@ export default function(state = defaultState, action) {
 	console.log("type: " + action.type)
     switch (action.type) {
     	case INIT_CONNECTION:
-    		console.log("irc-reducers:INIT_CONNECTION");
     		return {
-                //state: state.update('io', io => action.payload),
                 ...state,
                 io: action.payload
             }
     		break;
         case SET_CONNECTED: 
-            console.log("===== " + action.payload);
             return {
                 ...state,
                 connected: action.payload
@@ -50,11 +49,23 @@ export default function(state = defaultState, action) {
                 })
             }
             break;
-        case OPEN_NEW_CHANNEL:
+        case JOIN_CHANNEL:
+
+            var channels = state.channels;
+            var channel = null;
+
+            if (!channels.has(action.payload.name)) {
+                channel = {
+                    name: action.payload.name,
+                    topic: '',
+                    users: List()
+                }
+            }
+
             return {
                 ...state,
-                channels: channels.set(action.payload.channel.name, action.payload.channel),
-                activeChannel: action.payload.channel
+                channels: channels.set(action.payload.channel, channel),
+                activeChannel: action.payload.name
             }
             break;
         case SET_CHANNEL_TOPIC: 
@@ -71,34 +82,43 @@ export default function(state = defaultState, action) {
             } else {
                 console.log("Entry found for: " + action.payload.name);
                 channel = channels.get(action.payload.name);
-                channel.topic = action.payload.name;
+                channel.topic = action.payload.topic;
             }
 
             channels = channels.set(action.payload.name, channel);
             console.log("CHANNELS NOW: " + JSON.stringify(channels));
             return {
                 ...state,
-                channels: channels
+                channels: channels,
+                topic: action.payload.topic
             }
             break;
         case SET_CHANNEL_USERS: 
             var channel = null;
             var channels = state.channels;
-
+            console.log("SET_CHANNEL_USERS: payload: " + JSON.stringify(action.payload));
             if (!channels.has(action.payload.channel)) {
                 console.log("No entry for " + action.payload.channel);
                 channel = {
                     name: action.payload.channel,
                     users: action.payload.users
                 }
+            } else {
+                channel = channels.get(action.payload.channel);
             }
 
             channels = channels.set(action.payload.channel, channel);
-
+            console.log("SET_CHANNEL_USERS, channels: " + JSON.stringify(channels));
             return {
                 ...state,
                 channels: channels,
                 users: List(action.payload.users)
+            }
+            break;
+        case SET_CURRENT_CHANNEL:
+            return {
+                ...state,
+
             }
             break;
         default:

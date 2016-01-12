@@ -4,6 +4,7 @@ import ButtonPanel from './ButtonPanel';
 import UserPanel from './UserPanel';
 import Window from './Window';
 import InputPanel from './InputPanel';
+import Topic from './Topic';
 
 export default class IndexPage extends React.Component {
 
@@ -12,14 +13,18 @@ export default class IndexPage extends React.Component {
     }
 
     render() {
-        const {connectToIrc, processMessage, messages, channels, connected, users} = this.props;
+        const {connectToIrc, processMessage, messages, channels, connected, users, topic} = this.props;
 
         return (    
             <div className="component">
-                <Button disabled={connected == true} onClick={connectToIrc}>Connect</Button>
+                <div>
+                    <Button disabled={connected == true} onClick={connectToIrc}>Connect</Button>
+                </div>
+                
+                <UserPanel users={users}/>
+                <Topic topic={topic} />
                 <Window messages={messages} />
                 <InputPanel onSendMessage={processMessage}/>
-                <UserPanel users={users}/>
 
                 <ButtonPanel channels={channels}/>
             </div>
@@ -27,32 +32,6 @@ export default class IndexPage extends React.Component {
     }
 }
 
-/*
-    Kun liitytään kanavalle /JOIN #xxx -komennolla:
-
-    1) lähetetään komento palvelimelle
-    2) odotetaan, että saadaan palvelimelta ok-viesti (huoneeseen on pääsy)
-    3) lisätään ButtonPaneliin uusi nappi, jonka labelinä kanavan nimi
-    4) lisätään UserPaneliin kanavalla olevien käyttäjien nimet
-    5) näytetään kanavaan liittyvät viestit Window-komponentissa
-
-*/
-/*
-    state = {
-        channels: {
-            '#foo': {
-                topic: 'Lussutin lus',
-                modes: 'aeiou',
-                users: {
-                    {
-                        nick: 'jme',
-                        me: true
-                    },
-                    {
-                        nick: 'jme_'
-                    }
-                }
-            }
-        }
-    }
-*/
+IndexPage.defaultProps = {
+    topic: 'No topic set'
+}
