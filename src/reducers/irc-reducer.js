@@ -11,7 +11,8 @@ import {
     SET_CHANNEL_TOPIC,
     SET_CHANNEL_USERS,
     SET_CURRENT_CHANNEL,
-    JOIN_CHANNEL
+    JOIN_CHANNEL,
+    MESSAGE_TO_CHANNEL
 } from '../actions/irc-actions';
 
 const defaultState = {
@@ -24,6 +25,14 @@ const defaultState = {
     topic: null
 };
 
+function channelStructure() {
+    return {
+        name: null,
+        topic: null,
+        messages: List(),
+        users: List()
+    };
+}
 
 export default function(state = defaultState, action) {
 	console.log("type: " + action.type)
@@ -43,6 +52,7 @@ export default function(state = defaultState, action) {
         case RECEIVE_MESSAGE:
             return {
                 ...state,
+                channels: state.channels,
                 messages: state.messages.push({
                     message: action.payload,
                     timestamp: moment().valueOf()
@@ -52,53 +62,40 @@ export default function(state = defaultState, action) {
         case JOIN_CHANNEL:
 
             var channels = state.channels;
-            var channel = null;
+            var channel = channelStructure();
 
             if (!channels.has(action.payload.name)) {
-                channel = {
-                    name: action.payload.name,
-                    topic: '',
-                    users: List()
-                }
+                channel.name = action.payload.name;
             }
-
+            console.log("JOIN_CHANNEL: channels: " + JSON.stringify(channels.set(action.payload.channel, channel)));
             return {
                 ...state,
                 channels: channels.set(action.payload.channel, channel),
-                activeChannel: action.payload.name
+                activeChannel: action.payload.name,
+                messages: List(),
+                users: List()
             }
+
             break;
         case SET_CHANNEL_TOPIC: 
+            console.log("SET_CHANNEL_TOPIC, payload: " + JSON.stringify(action.payload));
 
-            var channel = null;
             var channels = state.channels;
-            console.log("SET_CHANNEL_TOPIC: " + JSON.stringify(action.payload));
-            if (!channels.has(action.payload.name)) {
-                console.log("No entry for " + action.payload.name);
-                channel = {
-                    name: action.payload.name,
-                    topic: action.payload.topic
-                }
-            } else {
-                console.log("Entry found for: " + action.payload.name);
-                channel = channels.get(action.payload.name);
-                channel.topic = action.payload.topic;
-            }
+            console.log("SET_CHANNEL_TOPIC, channels: " + JSON.stringify(channels));
 
-            channels = channels.set(action.payload.name, channel);
-            console.log("CHANNELS NOW: " + JSON.stringify(channels));
+            var channel = channels.get(action.payload.name);
+            channel.topic = action.payload.topic;
+
             return {
                 ...state,
-                channels: channels,
+                channels: channels.set(action.payload.name, channel),
                 topic: action.payload.topic
             }
             break;
         case SET_CHANNEL_USERS: 
             var channel = null;
             var channels = state.channels;
-            console.log("SET_CHANNEL_USERS: payload: " + JSON.stringify(action.payload));
             if (!channels.has(action.payload.channel)) {
-                console.log("No entry for " + action.payload.channel);
                 channel = {
                     name: action.payload.channel,
                     users: action.payload.users
@@ -118,12 +115,25 @@ export default function(state = defaultState, action) {
         case SET_CURRENT_CHANNEL:
             return {
                 ...state,
+            }
+            break;
+        case MESSAGE_TO_CHANNEL:
+            let userMessage = action.payload;
+            console.log("MESSAGE_TO_CHANNEL: " + JSON.stringify(userMessage));
+            let channel = state.channels.get(userMessage.receiver);
+            channel.messages = channel.messages.push(userMessage.message);
+            var messages = state.messages;
+            if (channel.name == state.activeChannel) {
+                messages: messages.push(userMessage.message);
+            }
 
+            return {
+                ...state,
+                channels: channels.set(channel.name, channel),
+                messages: messages
             }
             break;
         default:
-            console.log("RETURNING default state: " + JSON.stringify(state));
             return state;
-
     }
 };

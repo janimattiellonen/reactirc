@@ -151,10 +151,16 @@ export default class IrcService {
 			*/
 
 		} else if (this.parser.isUserMessage(str)) {
+
+			console.log("======= THIS IS a user message: " + str);
 			this.io.emit('server-message', str); 
 			// :jme!~jme@localhost TOPIC #foo :Mah topic 
-		} else if (this.parser.isUserPrivateMessage(str)) {
 			// :jme!~jme@localhost PRIVMSG jme2 :Hey
+			// :jme!~jme@localhost PRIVMSG #foo :foobar
+			let userMessage = this.parser.parseUserMessage(str);
+			this.io.emit('user-message', userMessage);
+		} else if (this.parser.isUserPrivateMessage(str)) {
+			// probably ignore this
 		}
 
 		// this.io.emit('server-message', data.toString());

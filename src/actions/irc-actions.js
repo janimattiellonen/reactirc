@@ -11,6 +11,7 @@ export const SET_CHANNEL_TOPIC		= 'SET_CHANNEL_TOPIC';
 export const SET_CHANNEL_USERS		= 'SET_CHANNEL_USERS';
 export const SET_CURRENT_CHANNEL	= 'SET_CURRENT_CHANNEL';
 export const JOIN_CHANNEL			= 'JOIN_CHANNEL';
+export const MESSAGE_TO_CHANNEL		= 'MESSAGE_TO_CHANNEL';
 
 let socket = null;
 let parser = new MessageParser();
@@ -26,6 +27,20 @@ export function initIoConnection() {
 				console.log("Server responded with: " + data);
 
 				dispatch(receiveMessage(data));
+			});
+
+			socket.on('user-message', (userMessage) => {
+
+				// let's first test this way and later on refacor
+				if (userMessage.command == 'PRIVMSG') {
+					// is target a channel
+					if (userMessage.receiver.indexOf('#') === 0) {
+						dispatch(messageToChannel(userMessage));
+					} else {
+						// private message to another user
+					}
+				}
+
 			});
 
 			// according to irc rfc1459, the user is allowed to join a channel, if the client receives a user list
@@ -105,9 +120,13 @@ export function processMessage(message) {
 	1) Tulostetaan Window-komponettiin sopiva viesti
 	2) Varmistetaan, että UserPaneli on tyhjä
 */
+}
 
-
-
+export function messageToChannel(userMessage) {
+	return {
+		type: MESSAGE_TO_CHANNEL,
+		payload: userMessage
+	}
 }
 
 export function sendMessage(message) {

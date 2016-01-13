@@ -7,12 +7,10 @@ export default class MessageParser {
 	}
 
 	isServerCommand(str) {
-		console.log('isServerCommand:' + str + '|');
 		return !this.hasPrefix(str);
 	}
 
 	isServerMessage(str) {
-		console.log('isServerMessage:' + str + '|');
 		// :irc.example.net 001 jme2 :Welcome to the Internet Relay Network jme2!~jme2@localhost :irc.example.net
 
 		if (!this.isServerCommand(str) && !this.hasUserPrefix(str)) {
@@ -37,17 +35,14 @@ export default class MessageParser {
 	}
 
 	isUserMessage(str) {
-		console.log('isUserMessage:' + str + '|');
 		return !this.isServerCommand(str) && !this.isServerMessage(str);
 	}
 
 	hasPrefix(str) {
-		console.log('hasPrefix:' + str + '|');
 		return null !== str &&str.indexOf(':') === 0;
 	}
 
 	parsePrefix(str) {
-		console.log('parsePrefix:' + str + '|');
 		if (!this.hasPrefix(str)) {
 			throw 'Does not contain a prefix: ' + str;
 		}
@@ -70,7 +65,6 @@ export default class MessageParser {
 	}
 
 	parseCommandPart(str) {
-		console.log('parseCommandPart:' + str + '|');
 		str = str.trim();
 
 		str = str.substring(str.indexOf('/') === 0 ? 1 : 0, str.length);
@@ -85,9 +79,7 @@ export default class MessageParser {
 	}
 
 	parseMessagePart(str) {
-		console.log('parseMessagePart:' + str + '|');
 		let commandPart = this.parseCommandPart(str);
-		console.log('parseMessagePart2:' + commandPart + '|');
 		let pos = str.indexOf(' ');
 
 		if (pos === -1) {
@@ -96,7 +88,6 @@ export default class MessageParser {
 
 		let m = str.substring(commandPart.length + 1, str.length);
 
-		console.log('mm:' + m + '|');
 		return m;
 	}
 
@@ -117,13 +108,10 @@ export default class MessageParser {
 			receiver: 		parts[2],
 		};
 
-		console.log("parseServerMessage:" + str + "|");
-
 		str = this.removeMessageIndicator(str);
 		let messageStartingPos = parts[0].length + parts[1].length + parts[2].length + 3;
 		
 		let messagePart = str.substring(messageStartingPos - 1, str.length);
-		console.log("MESSAGEPART:" + messagePart + "|");
 		serverMessageObj.message = this.removeMessageIndicator(messagePart);
 
 		// :irc.example.net 001 jme2 :Welcome to the Internet Relay Network jme2!~jme2@localhost
@@ -173,5 +161,44 @@ export default class MessageParser {
 
 	removeMessageIndicator(str) {
 		return str.indexOf(':') === 0 ? str.substring(1, str.length) : str;
+	}
+
+	parseUserMessage(str) {
+		str = this.removeMessageIndicator(str);
+
+		let sender = str.substring(0, str.indexOf('!'));
+		let senderHost = str.substring(str.indexOf('!~') + 2, str.indexOf(' '));
+		let command = str.split(' ')[1]
+		let receiver = str.split(' ')[2]
+		let message = str.substring(sender.length + senderHost.length + command.length + receiver.length + 6, str.length);
+
+		let userMessage = {
+			sender: sender,
+			senderHost: senderHost,
+			command: command,
+			receiver: receiver,
+			message: message
+		};
+
+		return userMessage;
+		/*
+		// :jme!~jme@localhost PRIVMSG #foo :foobar
+		userMessage = {
+			sender: 'jme',
+			senderHost: 'jme@localhost',
+			command: 'PRIVMSG',
+			receiver: '#foo',
+			message: 'foobar'
+		};
+
+		// :jme!~jme@localhost TOPIC #foo :Mah topic 
+		userMessage = {
+			sender: 'jme',
+			senderHost: 'jme@localhost',
+			command: 'TOPIC',
+			receiver: '#foo',
+			message: 'Mah topic'
+		};
+		*/
 	}
 }
