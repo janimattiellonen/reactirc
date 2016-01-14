@@ -17,7 +17,3 @@ export default class Topic extends React.Component {
         );
     }
 }
-
-Window.defaultProps = {
-	topic: 'No topic set'
-}

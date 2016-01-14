@@ -86,7 +86,9 @@ export default class MessageParser {
 			return null;
 		}
 
-		let m = str.substring(commandPart.length + 1, str.length);
+		let m = str.substring(commandPart.length + 2, str.length);
+
+		console.log("parseMessagePart|" + m + "|");
 
 		return m;
 	}
@@ -129,7 +131,7 @@ export default class MessageParser {
 			prefix: parts[0],
 			replyNumber: parts[1],
 			receiver: parts[2],
-			channel: parts[3],
+			channelName: parts[3],
 			topic: str.substring(pos + 1, str.length)
 		};
 

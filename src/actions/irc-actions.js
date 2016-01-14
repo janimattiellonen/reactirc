@@ -93,9 +93,9 @@ export function processMessage(message) {
 
 			switch (cmd) {
 				case 'JOIN':
-					let channel = parser.parseMessagePart(message);
-
-					dispatch(joinChannel(channel));
+					let channelName = parser.parseMessagePart(message);
+					console.log("processMessage: JOIN:" + channelName + ":");
+					dispatch(joinChannel(channelName));
 
 					return dispatch(sendMessage(message));
 				break;
@@ -135,13 +135,11 @@ export function sendMessage(message) {
     };
 }
 
-export function joinChannel(channel) {
-	return function(dispatch, getState) {
-		console.log("==== JOINING CHANNEL " + channel);
-        return {
-        	type: JOIN_CHANNEL,
-        	payload: channel
-        };
+export function joinChannel(channelName) {
+	console.log("==== JOINING CHANNEL " + channelName);
+    return {
+    	type: JOIN_CHANNEL,
+    	payload: channelName
     };
 }
 
@@ -166,9 +164,9 @@ export function setChannelUsers(data) {
 	}
 }
 
-export function setCurrentChannel(channel) {
+export function setCurrentChannel(channelName) {
 	return {
 		type: SET_CURRENT_CHANNEL,
-		payload: channel
+		payload: channelName
 	}
 }

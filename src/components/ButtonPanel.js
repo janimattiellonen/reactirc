@@ -3,23 +3,30 @@ import {Button, ButtonGroup} from 'react-bootstrap';
 import io from 'socket.io-client';
 
 export default class ButtonPanel extends React.Component {
+    constructor(props) {
+        super(props);
+    }
 
     render() {
 
-        const {channels} = this.props;
+        const {channels, onButtonClick} = this.props;
 
         return (
             <div className="button-panel">
                 {this.props.children}
 
-                <ButtonGroup>
-                    <Button key="status-button">Info</Button>
+                <div className="btn-group" data-toggle="buttons">
                     {channels.map((channel, i) => {
                         return (
-                            <Button key={i} onClick={this.onClick.bind(this, channel.name)}>{channel.name}</Button>
+                            <label onClick={this.onClick.bind(this, channel.name)}className="btn btn-default">
+                                <input key={i}  type="radio" name="options" id="option1" autocomplete="off" checked/> {channel.name} 
+                            </label>
                         )
                     })}
-                </ButtonGroup>
+                </div>
+
+
+  
 
             </div>
         );
@@ -30,6 +37,8 @@ export default class ButtonPanel extends React.Component {
     }
 
     onClick(id) {
-
+        console.log("id: " + id);
+        console.log("ofoo: " + JSON.stringify(this.props.channels));
+        this.props.onButtonClick(id);
     }
 }

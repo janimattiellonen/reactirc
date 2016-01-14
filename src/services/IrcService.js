@@ -119,7 +119,7 @@ export default class IrcService {
 					// example of how data could be sent
 					// may need to serialize object as JSON
 					this.io.emit('channel-topic', {
-						name: info.channel,
+						channelName: info.channelName,
 						topic: info.topic
 					});
 					break;

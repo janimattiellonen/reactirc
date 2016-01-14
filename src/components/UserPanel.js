@@ -6,15 +6,15 @@ export default class UserPanel extends React.Component {
     render() {
 
         const {users} = this.props;
-        
+
         return (
             <div className="user-panel">
                 <div className="">
 
                     <ul>
-                        {users.map(user => {
+                        {users.map((user, i) => {
                             return (
-                                <li>{this.renderUser(user)}</li>
+                                <li key={i}>{this.renderUser(user)}</li>
                             )
                         })}
                     </ul>

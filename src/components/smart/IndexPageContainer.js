@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import IndexPage from '../IndexPage';
-import {connectToIrc, initIoConnection, processMessage} from '../../actions/irc-actions';
+import {connectToIrc, initIoConnection, processMessage, setCurrentChannel} from '../../actions/irc-actions';
 
 function mapStateToProps(state) {
     return {
@@ -15,7 +15,8 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
     	connectToIrc: () => dispatch(connectToIrc()),
-        processMessage: (message) => dispatch(processMessage(message))
+        processMessage: (message) => dispatch(processMessage(message)),
+        setCurrentChannel: (channelName) => dispatch(setCurrentChannel(channelName))
     };
 }
 
