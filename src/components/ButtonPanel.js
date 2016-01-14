@@ -1,5 +1,4 @@
 import React from 'react';
-import {Button, ButtonGroup} from 'react-bootstrap';
 import io from 'socket.io-client';
 
 export default class ButtonPanel extends React.Component {
@@ -24,10 +23,6 @@ export default class ButtonPanel extends React.Component {
                         )
                     })}
                 </div>
-
-
-  
-
             </div>
         );
     }
@@ -37,8 +32,6 @@ export default class ButtonPanel extends React.Component {
     }
 
     onClick(id) {
-        console.log("id: " + id);
-        console.log("ofoo: " + JSON.stringify(this.props.channels));
         this.props.onButtonClick(id);
     }
 }
