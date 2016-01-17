@@ -117,7 +117,7 @@ export default function(state = defaultState, action) {
         case SET_CURRENT_CHANNEL:
 
             var channel = state.channels.get(action.payload);
-
+            console.log("SET_CURRENT_CHANNEL: " + JSON.stringify(channel.messages));
             return {
                 ...state,
                 activeChannel: action.payload,
@@ -127,21 +127,16 @@ export default function(state = defaultState, action) {
             break;
         case MESSAGE_TO_CHANNEL:
             let userMessage = action.payload;
-            console.log("MESSAGE_TO_CHANNEL: " + JSON.stringify(userMessage));
-            console.log("MESSAGE_TO_CHANNEL: channel exists for " + state.activeChannel + ": " + state.channels.has(state.activeChannel));
-            console.log("MESSAGE_TO_CHANNEL: channels " + JSON.stringify(state.channels));
-            console.log("MESSAGE_TO_CHANNEL, active channel: " + state.activeChannel);
+
             var channel = state.channels.get(userMessage.receiver);
             var messages = state.messages;
+            var newMessage = {message: userMessage.message};
+
+            channel.messages = channel.messages.push(newMessage);
 
             if (channel.name == state.activeChannel) {
-                var newMessage = {message: userMessage.message};
-                console.log("YIPPII");
-                messages = channel.messages.push(newMessage);
-                channel.messages = messages;
+                messages = channel.messages;
             }
-
-            console.log("MESSAGE_TO_CHANNEL active channel messages: " + JSON.stringify(messages));
 
             return {
                 ...state,
