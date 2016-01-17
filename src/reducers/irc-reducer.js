@@ -135,7 +135,8 @@ export default function(state = defaultState, action) {
             var newMessage = {
                 message: userMessage.message,
                 timestamp: moment().valueOf(),
-                sender: userMessage.sender
+                sender: userMessage.sender,
+                me: userMessage.me != null && userMessage.me == true
             };
 
             channel.messages = channel.messages.push(newMessage);

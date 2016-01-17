@@ -4,6 +4,10 @@ import io from 'socket.io-client';
 export default class ButtonPanel extends React.Component {
     constructor(props) {
         super(props);
+
+        this.state = {
+            selectedButton: null
+        }
     }
 
     render() {
@@ -27,11 +31,13 @@ export default class ButtonPanel extends React.Component {
         );
     }
 
-    componentDidMount() {
-
-    }
-
     onClick(id) {
-        this.props.onButtonClick(id);
+        if (this.state.selectedButton !== id) {
+            this.props.onButtonClick(id);
+
+            this.setState({
+                selectedButton: id
+            });
+        }
     }
 }

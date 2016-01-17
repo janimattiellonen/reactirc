@@ -103,6 +103,13 @@ export function processMessage(message) {
 				break;
 			}
 		} else {
+			dispatch(messageToChannel({
+				message: message,
+				receiver: getState().irc.activeChannel,
+				sender: 'jme2', // hardcoded for now
+				me: true
+			}));
+
 			return dispatch(sendMessage({
 				message: message,
 				receiver: getState().irc.activeChannel
