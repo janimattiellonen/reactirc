@@ -34,14 +34,9 @@ export default class IrcService {
 			let messages = List(data.match(/[^\r\n]+/g));
 
 			console.log("messages length: " + messages.length);
-
 			console.log("messages: " + messages);
 
 			messages.filter(m => m != null).map(message => this.handleServerData(message));
-
-		
-
-		
 
 			//this.handleServerData(data.toString());
 			//this.io.emit('server-message', data.toString());
@@ -54,30 +49,32 @@ export default class IrcService {
 			// 4) action done by the server
 			// 		:irc.example.net 001 jme2 :Welcome to the Internet Relay Network jme2!~jme2@localhost :irc.example.Network
 		});
-
-
 	}
 
 	processInput(input) {
 		try {
-			input = input.replace(/\r?\n|\r/g,"");
-
-			// begins with a '/'
-			if (this.parser.isUserCommand(input)) {
-				let command = this.parser.parseCommandPart(input);
-				console.log("command:" + command + ":");
-
-				let func = this.createUserCommand(command);
-
-				if (typeof this[func] == 'function') {
-					this[func](input);
-				} else {
-					// we don't know how to process this
-					console.log('Unknown command: ' + command)
-				}
+			if (typeof input === 'object') {
+				this.handleUserMessage(input);
 			} else {
-				// a normal message either to a user or to a channel
-				console.log("User message. NOT SUPPORTED YET: " + input);
+				input = input.replace(/\r?\n|\r/g,"");
+
+				// begins with a '/'
+				if (this.parser.isUserCommand(input)) {
+					let command = this.parser.parseCommandPart(input);
+					console.log("command:" + command + ":");
+
+					let func = this.createUserCommand(command);
+
+					if (typeof this[func] == 'function') {
+						this[func](input);
+					} else {
+						// we don't know how to process this
+						console.log('Unknown command: ' + command)
+					}
+				} else {
+					// a normal message either to a user or to a channel
+					console.log('Unknown message type!');
+				}
 			}
 		} catch (e) {
 			console.log("ERROR: " + e);
@@ -86,6 +83,13 @@ export default class IrcService {
 
 	createUserCommand(command) {
 		return 'send' + command.toLowerCase().charAt(0).toUpperCase() + command.toLowerCase().slice(1);
+	}
+
+	handleUserMessage(message) {
+		// message.message
+		// message.receiver
+
+		this.sendPrivateMessage(message);
 	}
 
 	handleServerData(str) {
@@ -194,5 +198,7 @@ export default class IrcService {
 		this.write(jc.create(cmd));
 	}
 
-
+	sendPrivateMessage(message) {
+		this.write('PRIVMSG ' + message.receiver + ' :' + message.message);
+	}
 }

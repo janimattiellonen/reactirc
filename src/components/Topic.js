@@ -7,13 +7,16 @@ export default class Topic extends React.Component {
 	}
 
     render() {
-
-    	const {topic} = this.props;
-
         return (
             <div className="topic">
-        		{topic}
+        		{this.getTopic()}
             </div>
         );
+    }
+
+    getTopic() {
+        const {topic} = this.props;
+        
+        return (null == topic || topic.length == 0) ? 'No topic set' : topic;
     }
 }

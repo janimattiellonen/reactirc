@@ -12,12 +12,13 @@ export default class Window extends React.Component {
     render() {
 
     	const {messages} = this.props;
+        console.log("mm: " + JSON.stringify(messages));
 
         return (
             <div className="window">
         		{messages.map((message, i) => 
                     <div key={i} className="message-row">
-    					{moment(message.timestamp).format('HH:mm')}: {message.message}
+    					<span className="timestamp">{moment(message.timestamp).format('HH:mm')}</span><span className="sender">{message.sender}</span><span className="message">{message.message}</span>
     				</div>
                     ) 
                 }		

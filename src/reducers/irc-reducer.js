@@ -73,7 +73,8 @@ export default function(state = defaultState, action) {
                 channels: channels.set(action.payload, channel),
                 activeChannel: action.payload,
                 messages: List(),
-                users: List()
+                users: List(),
+                topic: state.topic
             }
 
             break;
@@ -122,7 +123,8 @@ export default function(state = defaultState, action) {
                 ...state,
                 activeChannel: action.payload,
                 messages: channel.messages,
-                users: channel.users
+                users: channel.users,
+                topic: channel.topic
             }
             break;
         case MESSAGE_TO_CHANNEL:
@@ -130,7 +132,11 @@ export default function(state = defaultState, action) {
 
             var channel = state.channels.get(userMessage.receiver);
             var messages = state.messages;
-            var newMessage = {message: userMessage.message};
+            var newMessage = {
+                message: userMessage.message,
+                timestamp: moment().valueOf(),
+                sender: userMessage.sender
+            };
 
             channel.messages = channel.messages.push(newMessage);
 

@@ -84,7 +84,6 @@ export function connectToIrc() {
 }
 
 export function processMessage(message) {
-
 	return function (dispatch, getState) {
 		if (parser.isUserCommand(message)) {
 			console.log(message + ' is a user command');
@@ -99,12 +98,16 @@ export function processMessage(message) {
 
 					return dispatch(sendMessage(message));
 				break;
+				default:
+					return dispatch(sendMessage(message));
+				break;
 			}
 		} else {
-			console.log(message + ' is NOT a user command');
+			return dispatch(sendMessage({
+				message: message,
+				receiver: getState().irc.activeChannel
+			}));
 		}
-
-		//return dispatch(sendMessage(message));
 	}
 /*
     Kun liitytään kanavalle /JOIN #xxx -komennolla:
