@@ -12,6 +12,8 @@ export class CommandFactory {
 		switch (command) {
 			case 'JOIN':
 				return new JoinCommand();
+			case 'PART':
+				return new PartCommand();
 			case 'NICK': 
 				return new NickCommand();
 			case 'USER':
@@ -41,6 +43,14 @@ export class JoinCommand extends Command {
 		let join = 'JOIN ' + this.parser.parseMessagePart(str);
 
 		return join;
+	}
+}
+
+export class PartCommand extends Command {
+	create(str) {
+		let part = 'PART ' + this.parser.parseMessagePart(str);
+
+		return part;
 	}
 }
 

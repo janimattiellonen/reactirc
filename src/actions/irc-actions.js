@@ -11,6 +11,7 @@ export const SET_CHANNEL_TOPIC		= 'SET_CHANNEL_TOPIC';
 export const SET_CHANNEL_USERS		= 'SET_CHANNEL_USERS';
 export const SET_CURRENT_CHANNEL	= 'SET_CURRENT_CHANNEL';
 export const JOIN_CHANNEL			= 'JOIN_CHANNEL';
+export const PART_CHANNEL			= 'PART_CHANNEL';
 export const MESSAGE_TO_CHANNEL		= 'MESSAGE_TO_CHANNEL';
 
 let socket = null;
@@ -92,11 +93,18 @@ export function processMessage(message) {
 
 			switch (cmd) {
 				case 'JOIN':
-					let channelName = parser.parseMessagePart(message);
+					var channelName = parser.parseMessagePart(message);
 					console.log("processMessage: JOIN:" + channelName + ":");
 					dispatch(joinChannel(channelName));
 
 					return dispatch(sendMessage(message));
+				break;
+				case 'PART':
+					var channelName = parser.parseMessagePart(message);
+					console.log("processMessage: PART:" + channelName + ":");
+					dispatch(sendMessage(message));
+
+					return dispatch(partChannel(channelName));
 				break;
 				default:
 					return dispatch(sendMessage(message));
@@ -146,9 +154,15 @@ export function sendMessage(message) {
 }
 
 export function joinChannel(channelName) {
-	console.log("==== JOINING CHANNEL " + channelName);
     return {
     	type: JOIN_CHANNEL,
+    	payload: channelName
+    };
+}
+
+export function partChannel(channelName) {
+    return {
+    	type: PART_CHANNEL,
     	payload: channelName
     };
 }

@@ -12,6 +12,7 @@ import {
     SET_CHANNEL_USERS,
     SET_CURRENT_CHANNEL,
     JOIN_CHANNEL,
+    PART_CHANNEL,
     MESSAGE_TO_CHANNEL
 } from '../actions/irc-actions';
 
@@ -59,7 +60,6 @@ export default function(state = defaultState, action) {
             }
             break;
         case JOIN_CHANNEL:
-
             var channels = state.channels;
             var channel = channelStructure();
 
@@ -75,6 +75,34 @@ export default function(state = defaultState, action) {
                 messages: List(),
                 users: List(),
                 topic: state.topic
+            }
+
+            break;
+        case PART_CHANNEL:
+            var channels = state.channels;
+            var channel = action.payload;
+            var activeChannel = null;
+            var topic = null;
+            var users = List();
+            var messages = List();
+
+            channels = channels.remove(channel);
+
+            if (channels.count() > 0) {
+                var lastChannel = channels.last();
+                activeChannel = lastChannel.name;
+                messages = lastChannel.channels;
+                users = lastChannel.users;
+                topic = lastChannel.topic;
+            }
+
+            return {
+                ...state,
+                channels: channels.remove(channel),
+                activeChannel: activeChannel,
+                messages: messages,
+                users: users,
+                topic: topic
             }
 
             break;

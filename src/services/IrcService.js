@@ -198,6 +198,12 @@ export default class IrcService {
 		this.write(jc.create(cmd));
 	}
 
+	sendPart(cmd) {
+		let pc = CommandFactory.create('PART');
+
+		this.write(pc.create(cmd));
+	}
+
 	sendPrivateMessage(message) {
 		this.write('PRIVMSG ' + message.receiver + ' :' + message.message);
 	}
