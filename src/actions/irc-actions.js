@@ -100,11 +100,15 @@ export function processMessage(message) {
 					return dispatch(sendMessage(message));
 				break;
 				case 'PART':
-					var channelName = parser.parseMessagePart(message);
+					// /PART [channel name implied]
+					// /PART #foo 
+					// /PART #foo bye
+					// /PART #foo Bye bye
+					var partObj = parser.parsePartCommand(message);
 					console.log("processMessage: PART:" + channelName + ":");
-					dispatch(sendMessage(message));
+					dispatch(sendMessage(parser.parsePartCommand(message, true)));
 
-					return dispatch(partChannel(channelName));
+					return dispatch(partChannel(partObj.channelName));
 				break;
 				default:
 					return dispatch(sendMessage(message));

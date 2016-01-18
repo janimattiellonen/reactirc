@@ -138,6 +138,32 @@ export default class MessageParser {
 		return topic;
 	}
 
+	parsePartCommand(str, inline = true) {
+		if (null == str) {
+			throw "Invalid command, nothing given";
+		}
+
+		str = str.trim();
+
+		// /PART #foo
+		// /PART #foo Bye
+		// /PART #foo Bye bye
+
+		let parts = str.split(' ');
+
+		let info = {
+			command: parts[0]
+		};
+
+		if (parts.length > 1) {
+			info.command = parts[0];
+			info.channel = parts[1];
+			info.partMessage = str.substring(parts[0].length + parts[1].length + 2, str.length);
+		}
+
+		return inline ? info.join(' ') : info;
+	}
+
 	parseUserList(str) {
 		// :irc.example.net 353 jme2 = #foo :jme2 @jme
 		str = this.removeMessageIndicator(str);

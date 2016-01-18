@@ -47,8 +47,9 @@ export class JoinCommand extends Command {
 }
 
 export class PartCommand extends Command {
-	create(str) {
-		let part = 'PART ' + this.parser.parseMessagePart(str);
+	create(str, channelName = null) {
+		let partObj = this.parser.parseMessagePart(str);
+		let part = 'PART ' + ;
 
 		return part;
 	}
