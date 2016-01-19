@@ -48,10 +48,11 @@ export class JoinCommand extends Command {
 
 export class PartCommand extends Command {
 	create(str, channelName = null) {
-		let partObj = this.parser.parseMessagePart(str);
-		let part = 'PART ' + ;
-
-		return part;
+		console.log("PartCommand:" + str + "|");
+		let part = this.parser.parsePartCommand(str, true);
+		console.log("PartCommand2:" + part + "|");
+		console.log("PartCommand3:" + part.substring(1, part.length) + "|");
+		return part.substring(1, part.length);
 	}
 }
 

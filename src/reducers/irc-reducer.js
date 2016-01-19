@@ -66,8 +66,7 @@ export default function(state = defaultState, action) {
             if (!channels.has(action.payload)) {
                 channel.name = action.payload;
             }
-            console.log("JOIN_CHANNEL, channel name: " + action.payload);
-            console.log("JOIN_CHANNEL: channel exists for " + action.payload + ": " + channels.has(action.payload));            
+           
             return {
                 ...state,
                 channels: channels.set(action.payload, channel),
@@ -91,7 +90,7 @@ export default function(state = defaultState, action) {
             if (channels.count() > 0) {
                 var lastChannel = channels.last();
                 activeChannel = lastChannel.name;
-                messages = lastChannel.channels;
+                messages = lastChannel.messages;
                 users = lastChannel.users;
                 topic = lastChannel.topic;
             }
@@ -107,12 +106,7 @@ export default function(state = defaultState, action) {
 
             break;
         case SET_CHANNEL_TOPIC: 
-            console.log("SET_CHANNEL_TOPIC, payload: " + JSON.stringify(action.payload));
-
             var channels = state.channels;
-            console.log("SET_CHANNEL_TOPIC, channels: " + JSON.stringify(channels));
-            console.log("SET_CHANNEL_TOPIC: channel exists for " + action.payload.channelName + ": " + channels.has(action.payload.channelName));
-
             var channel = channels.get(action.payload.channelName);
             channel.topic = action.payload.topic;
 

@@ -1,4 +1,5 @@
 import {List} from 'immutable';
+import _ from 'lodash';
 
 export default class MessageParser {
 
@@ -79,6 +80,7 @@ export default class MessageParser {
 	}
 
 	parseMessagePart(str) {
+		console.log("parseMessagePart1|" + m + "|");
 		let commandPart = this.parseCommandPart(str);
 		let pos = str.indexOf(' ');
 
@@ -145,10 +147,6 @@ export default class MessageParser {
 
 		str = str.trim();
 
-		// /PART #foo
-		// /PART #foo Bye
-		// /PART #foo Bye bye
-
 		let parts = str.split(' ');
 
 		let info = {
@@ -157,11 +155,11 @@ export default class MessageParser {
 
 		if (parts.length > 1) {
 			info.command = parts[0];
-			info.channel = parts[1];
+			info.channelName = parts[1];
 			info.partMessage = str.substring(parts[0].length + parts[1].length + 2, str.length);
 		}
 
-		return inline ? info.join(' ') : info;
+		return inline ? _.toArray(info).join(' ') : info;
 	}
 
 	parseUserList(str) {

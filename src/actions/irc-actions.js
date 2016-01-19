@@ -94,20 +94,13 @@ export function processMessage(message) {
 			switch (cmd) {
 				case 'JOIN':
 					var channelName = parser.parseMessagePart(message);
-					console.log("processMessage: JOIN:" + channelName + ":");
 					dispatch(joinChannel(channelName));
 
 					return dispatch(sendMessage(message));
 				break;
 				case 'PART':
-					// /PART [channel name implied]
-					// /PART #foo 
-					// /PART #foo bye
-					// /PART #foo Bye bye
-					var partObj = parser.parsePartCommand(message);
-					console.log("processMessage: PART:" + channelName + ":");
-					dispatch(sendMessage(parser.parsePartCommand(message, true)));
-
+					var partObj = parser.parsePartCommand(message, false);
+					dispatch(sendMessage(parser.parsePartCommand(message)));
 					return dispatch(partChannel(partObj.channelName));
 				break;
 				default:
