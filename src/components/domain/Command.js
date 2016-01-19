@@ -75,7 +75,6 @@ export class Reply extends Command {
 
 export class PongReply extends Reply {
 	create(str) {
-		console.log("Creating PONG: " + str + "|");
 		return 'PONG ' + this.parser.parseMessagePart(str);
 	}
 }
