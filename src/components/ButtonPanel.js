@@ -22,7 +22,7 @@ export default class ButtonPanel extends React.Component {
                     {channels.map((channel, i) => {
                         return (
                             <label onClick={this.onClick.bind(this, channel.name)}className="btn btn-default">
-                                <input key={i}  type="radio" name="options" id="option1" autocomplete="off" checked/> {channel.name} 
+                                <input key={i} type="radio" name="options" data-id={channel.name} autocomplete="off" /> {channel.name} 
                             </label>
                         )
                     })}

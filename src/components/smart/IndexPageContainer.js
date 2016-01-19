@@ -4,11 +4,12 @@ import {connectToIrc, initIoConnection, processMessage, setCurrentChannel} from 
 
 function mapStateToProps(state) {
     return {
-       messages: state.irc.messages,
-       channels: state.irc.channels,
-       connected: state.irc.connected,
-       users: state.irc.users,
-       topic: state.irc.topic
+        messages: state.irc.messages,
+        channels: state.irc.channels,
+        currentChannel: state.irc.activeChannel,
+        connected: state.irc.connected,
+        users: state.irc.users,
+        topic: state.irc.topic
     }
 }
 

@@ -95,7 +95,8 @@ export function processMessage(message) {
 				case 'JOIN':
 					var channelName = parser.parseMessagePart(message);
 					dispatch(joinChannel(channelName));
-
+					dispatch(setCurrentChannel(channelName));
+					
 					return dispatch(sendMessage(message));
 				break;
 				case 'PART':

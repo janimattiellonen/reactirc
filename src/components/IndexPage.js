@@ -13,7 +13,7 @@ export default class IndexPage extends React.Component {
     }
 
     render() {
-        const {connectToIrc, processMessage, setCurrentChannel, messages, channels, connected, users, topic} = this.props;
+        const {connectToIrc, processMessage, setCurrentChannel, currentChannel, messages, channels, connected, users, topic} = this.props;
 
         return (    
             <div className="component">
@@ -26,7 +26,7 @@ export default class IndexPage extends React.Component {
                 <Window messages={messages} />
                 <InputPanel onSendMessage={processMessage}/>
 
-                <ButtonPanel onButtonClick={setCurrentChannel} channels={channels}/>
+                <ButtonPanel onButtonClick={setCurrentChannel} currentChannel={currentChannel} channels={channels}/>
             </div>
         );
     }
