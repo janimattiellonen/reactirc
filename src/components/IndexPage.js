@@ -21,12 +21,13 @@ export default class IndexPage extends React.Component {
                     <Button disabled={connected == true} onClick={connectToIrc}>Connect</Button>
                 </div>
                 
-                <UserPanel users={users}/>
-                <Topic topic={topic} />
-                <Window messages={messages} />
-                <InputPanel onSendMessage={processMessage}/>
-
-                <ButtonPanel onButtonClick={setCurrentChannel} currentChannel={currentChannel} channels={channels}/>
+                <div className="wrapper">
+                    <Topic topic={topic} />
+                    <Window messages={messages} />
+                    <UserPanel users={users}/>
+                    <InputPanel onSendMessage={processMessage}/>
+                    <ButtonPanel onButtonClick={setCurrentChannel} currentChannel={currentChannel} channels={channels}/>
+                </div>
             </div>
         );
     }
