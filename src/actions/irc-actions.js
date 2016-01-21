@@ -7,6 +7,8 @@ export const INIT_CONNECTION 		= 'INIT_CONNECTION';
 export const SET_CONNECTED			= 'SET_CONNECTED';
 export const RECEIVE_MESSAGE 		= 'RECEIVE_MESSAGE';
 
+export const SET_CURRENT_NICK		= 'SET_CURRENT_NICK';
+
 export const SET_CHANNEL_TOPIC		= 'SET_CHANNEL_TOPIC';
 export const SET_CHANNEL_USERS		= 'SET_CHANNEL_USERS';
 export const SET_CURRENT_CHANNEL	= 'SET_CURRENT_CHANNEL';
@@ -74,13 +76,28 @@ export function setConnected(state) {
 	}
 }
 
-export function connectToIrc() {
+export function connectToIrc(nick, host, port) {
+	console.log("1 nick: " + nick + ", host: " + host + ", port: " + port);
 	return function(dispatch, getState) {
 		const io = getState().irc.io;
+		console.log("2 nick: " + nick + ", host: " + host + ", port: " + port);
+		io.emit('app-command', {
+			command: 'connect',
+			nick: nick,
+			host: host,
+			port: port
+		});
 
-		io.emit('app-command', 'connect');
-
+		// this assumes connection is ok
+		// we should set connection status depending on success rate
 		return dispatch(setConnected(true));
+	}
+}
+
+export function setCurrentNick(nick) {
+	return {
+		type: SET_CURRENT_NICK,
+		payload: nick
 	}
 }
 
@@ -112,7 +129,7 @@ export function processMessage(message) {
 			dispatch(messageToChannel({
 				message: message,
 				receiver: getState().irc.activeChannel,
-				sender: 'jme2', // hardcoded for now
+				sender: getState().irc.nick,
 				me: true
 			}));
 

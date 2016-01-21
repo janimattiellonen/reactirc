@@ -62,14 +62,15 @@ io.on('connection', function(socket){
         ircService.processInput(message);
     });
 
-    socket.on('app-command', function(message) {
-        console.log('app-command: ' + message);
+    socket.on('app-command', function(data) {
 
-        if (message == 'connect') {
+        console.log('app-command: ' + JSON.stringify(data));
+
+        if (data.command == 'connect') {
             client = new net.Socket();
             ircService = new IrcService(client, io);
             console.log("Connecting to irc...");
-            ircService.connect();
+            ircService.connect(data.nick, data.host, data.port);
         }
     });
 });

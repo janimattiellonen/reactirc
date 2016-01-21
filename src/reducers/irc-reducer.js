@@ -7,6 +7,7 @@ console.log("loading irc-reducers");
 import {
 	INIT_CONNECTION,
     SET_CONNECTED,
+    SET_CURRENT_NICK,
     RECEIVE_MESSAGE,
     SET_CHANNEL_TOPIC,
     SET_CHANNEL_USERS,
@@ -21,6 +22,7 @@ const defaultState = {
     messages: List(),
     channels: Map(),
     users: List(),
+    nick: null,
     currentChannel: null,
     connected: false,
     topic: null
@@ -43,13 +45,22 @@ export default function(state = defaultState, action) {
                 ...state,
                 io: action.payload
             }
+            
     		break;
         case SET_CONNECTED: 
             return {
                 ...state,
                 connected: action.payload
             }
+
             break;
+        case SET_CURRENT_NICK:
+            return {
+                ...state,
+                nick: action.payload
+            }    
+
+            break;    
         case RECEIVE_MESSAGE:
             return {
                 ...state,

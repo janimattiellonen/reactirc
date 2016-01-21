@@ -14,16 +14,16 @@ export default class IrcService {
 		this.command 	= new Command();
 	}
 
-	connect() {
+	connect(nick, host, port) {
 
 		this.socket.on('uncaughtException', (err) => {
 			console.log("UNCAUGHT EXCEPTION: " + err);
 		});
 
-		this.socket.connect(6667, '127.0.0.1', () => {
+		this.socket.connect(port, host, () => {
 			console.log('Connected');
-
-			this.sendNick('/NICK jme2' + (Math.floor(Math.random() * (100 - 3)) + 100));
+;
+			this.sendNick('/NICK ' + nick);
 		});
 
 		this.socket.on('data', (data) => {

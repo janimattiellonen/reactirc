@@ -15,7 +15,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-    	connectToIrc: () => dispatch(connectToIrc()),
+    	connectToIrc: (nick, host, port) => dispatch(connectToIrc(nick, host, port)),
         processMessage: (message) => dispatch(processMessage(message)),
         setCurrentChannel: (channelName) => dispatch(setCurrentChannel(channelName))
     };
