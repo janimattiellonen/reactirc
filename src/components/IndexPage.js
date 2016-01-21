@@ -3,6 +3,7 @@ import {Button} from 'react-bootstrap';
 import ButtonPanel from './ButtonPanel';
 import UserPanel from './UserPanel';
 import Window from './Window';
+import LoginWindow from './LoginWindow';
 import InputPanel from './InputPanel';
 import Topic from './Topic';
 
@@ -13,23 +14,46 @@ export default class IndexPage extends React.Component {
     }
 
     render() {
-        const {connectToIrc, processMessage, setCurrentChannel, currentChannel, messages, channels, connected, users, topic} = this.props;
+        const {connected} = this.props;
 
         return (    
             <div className="component">
-                <div>
-                    <Button disabled={connected == true} onClick={connectToIrc}>Connect</Button>
-                </div>
                 
-                <div className="wrapper">
-                    <Topic topic={topic} />
-                    <Window messages={messages} />
-                    <UserPanel users={users}/>
-                    <InputPanel onSendMessage={processMessage}/>
-                    <ButtonPanel onButtonClick={setCurrentChannel} currentChannel={currentChannel} channels={channels}/>
-                </div>
+                {this.renderContents()}
             </div>
         );
+    }
+
+    renderContents() {
+        const {connected} = this.props;
+
+        if (connected) {
+            return this.renderIrcWindow();
+        } else {
+            return this.renderLoginWindow();
+        }
+    }
+
+    renderIrcWindow() {
+        const {processMessage, setCurrentChannel, currentChannel, messages, channels, connected, users, topic} = this.props;
+
+        return (
+            <div className="wrapper">
+                <Topic topic={topic} />
+                <Window messages={messages} />
+                <UserPanel users={users}/>
+                <InputPanel onSendMessage={processMessage}/>
+                <ButtonPanel onButtonClick={setCurrentChannel} currentChannel={currentChannel} channels={channels}/>
+            </div>
+        )
+    }
+
+    renderLoginWindow() {
+        const {connectToIrc} = this.props;
+
+        return (
+            <LoginWindow connectToIrc={connectToIrc} />
+        )
     }
 }
 
