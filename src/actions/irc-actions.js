@@ -129,20 +129,6 @@ export function processMessage(message) {
 			}));
 		}
 	}
-/*
-    Kun liitytään kanavalle /JOIN #xxx -komennolla:
-
-	1) Lisätään ButtonPaneliin nappi
-	2) Lisätään stateen uusi entry kanavalle
-	3) Asetetaan kanava nykyiseksi kanavaksi
-	4) Window-komponenttiin nykyisen kanavan sisältö
-    5) Lähetetään komento palvelimelle
-    6) Lisätään UserPaneliin käyttäjät
-	
-	Jos pääsy kanavalle on kielletty
-	1) Tulostetaan Window-komponettiin sopiva viesti
-	2) Varmistetaan, että UserPaneli on tyhjä
-*/
 }
 
 export function messageToChannel(userMessage) {

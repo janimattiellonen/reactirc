@@ -127,6 +127,24 @@ export default function(state = defaultState, action) {
         case SET_CHANNEL_USERS: 
             var channel = null;
             var channels = state.channels;
+            console.log("bb: " + action.payload.channel);
+            console.log("JJJ: " + JSON.stringify(channels));
+
+            channel = channels.get(action.payload.channel)
+            channel.users = List(action.payload.users);
+
+            channels = channels.set(action.payload.channel, channel);
+
+            return {
+                ...state,
+                channels: channels,
+                users: List(action.payload.users)
+            }
+            break;
+
+        case 'ugh': 
+            var channel = null;
+            var channels = state.channels;
 
             if (!channels.has(action.payload.channel)) {
                 channel = {
@@ -144,11 +162,12 @@ export default function(state = defaultState, action) {
                 channels: channels,
                 users: List(action.payload.users)
             }
-            break;
+            break;     
+
         case SET_CURRENT_CHANNEL:
 
             var channel = state.channels.get(action.payload);
-
+            console.log("channel: " + JSON.stringify(channel));
             return {
                 ...state,
                 activeChannel: action.payload,
