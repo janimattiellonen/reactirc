@@ -139,6 +139,7 @@ export default class IrcService {
 			// :jme!~jme@localhost PRIVMSG jme2 :Hey
 			// :jme!~jme@localhost PRIVMSG #foo :foobar
 			let userMessage = this.parser.parseUserMessage(str);
+			console.log("userMessage: " + JSON.stringify(userMessage));
 			this.io.emit('user-message', userMessage);
 		} else if (this.parser.isUserPrivateMessage(str)) {
 			// probably ignore this

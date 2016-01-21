@@ -12,7 +12,8 @@ import {
     SET_CURRENT_CHANNEL,
     JOIN_CHANNEL,
     PART_CHANNEL,
-    MESSAGE_TO_CHANNEL
+    MESSAGE_TO_CHANNEL,
+    USER_PARTS_CHANNEL
 } from '../actions/irc-actions';
 
 const defaultState = {
@@ -110,6 +111,22 @@ export default function(state = defaultState, action) {
                 messages: messages,
                 users: users,
                 topic: topic
+            }
+
+            break;
+        case USER_PARTS_CHANNEL:
+            console.log(USER_PARTS_CHANNEL + ": " + JSON.stringify(action.payload));
+            console.log(USER_PARTS_CHANNEL + " 2: " + JSON.stringify(action.payload.nick));
+            var channels = state.channels;
+            var channel = channels.get(action.payload.channelName);
+
+            channel.users = channel.users.filter(user => user.nick != action.payload.nick);
+            console.log("ooo: " + JSON.stringify(channel.users));
+
+            return {
+                ...state,
+                channels: channels.set(action.payload.channelName, channel),
+                users: channel.users
             }
 
             break;

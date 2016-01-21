@@ -14,6 +14,7 @@ export const SET_CHANNEL_USERS		= 'SET_CHANNEL_USERS';
 export const SET_CURRENT_CHANNEL	= 'SET_CURRENT_CHANNEL';
 export const JOIN_CHANNEL			= 'JOIN_CHANNEL';
 export const PART_CHANNEL			= 'PART_CHANNEL';
+export const USER_PARTS_CHANNEL		= 'USER_PARTS_CHANNEL';
 export const MESSAGE_TO_CHANNEL		= 'MESSAGE_TO_CHANNEL';
 
 let socket = null;
@@ -30,15 +31,25 @@ export function initIoConnection() {
 
 			socket.on('user-message', (userMessage) => {
 
-				// let's first test this way and later on refacor
-				if (userMessage.command == 'PRIVMSG') {
+				// let's first test this way and later on refactor
+				switch (userMessage.command) {
+					case 'PRIVMSG':
 					// is target a channel
 					if (userMessage.receiver.indexOf('#') === 0) {
 						dispatch(messageToChannel(userMessage));
 					} else {
 						// private message to another user
 					}
+					break;
+					case 'PART':
+					console.log("PART: " + JSON.stringify(userMessage));
+						dispatch(userPartsChannel(userMessage.sender, userMessage.receiver));
+					break;
+					default:
+						console.log("Client: unknown user message command: " + userMessage.command);
+					break;
 				}
+				
 
 			});
 
@@ -155,6 +166,16 @@ export function partChannel(channelName) {
     return {
     	type: PART_CHANNEL,
     	payload: channelName
+    };
+}
+
+export function userPartsChannel(nick, channelName) {
+    return {
+    	type: USER_PARTS_CHANNEL,
+    	payload: {
+    		nick: nick,
+    		channelName: channelName
+    	}
     };
 }
 
