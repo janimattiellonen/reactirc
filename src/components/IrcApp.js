@@ -1,9 +1,8 @@
 import React from 'react';
 
-export default class ReactIrcApp extends React.Component {
+export default class IrcApp extends React.Component {
 
     render() {
-
         return (
             <div>
                 <h1>
@@ -16,7 +15,8 @@ export default class ReactIrcApp extends React.Component {
         );
     }
 
-    componentDidMount() {
-    
+    componentWillMount() {
+        const {initIoConnection, sendMessage} = this.props;
+        initIoConnection();
     }
 }

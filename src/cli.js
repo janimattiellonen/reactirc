@@ -4,17 +4,18 @@ process.stdin.resume();
 process.stdin.setEncoding('utf8');
 var util = require('util');
 
-//var net = require('net');
-
 import net from 'net';
-import {CommandFactory, Command} from './components/domain/Command';
+import {CommandFactory, Command, ReplyFactory, Reply} from './components/domain/Command';
 
 var client = new net.Socket();
 var connected = false;
+let receivedData = "";
+
 
 process.stdin.on('data', function (input) {
 	try {
 		input = input.replace(/\r?\n|\r/g,"");
+
 		let command = getCommand(input);
 
 	    if (command == 'connect') {
@@ -25,6 +26,9 @@ process.stdin.on('data', function (input) {
 	    	sendNick(input);
 	    } else if (command == "quit") {
 	    	done();
+	    } else if (input.indexOf("=") === 0) {
+	    	// we are simulating server messages
+	    	handleServerData(input.substring(1, input.length));
 	    }
 	} catch (e) {
 		console.log("ERROR: " + e);
@@ -32,8 +36,47 @@ process.stdin.on('data', function (input) {
 });
 
 client.on('data', function(data) {
-	console.log("FROM SERVER: " + data);
+	console.log("FROM SERVER: " + data.toString().trim() + "|");
+	handleServerData(data.toString());
+	// PING :irc.example.net
+
+
+	// message types that the server sends to the client:
+	// 1) message from another user (private message)
+	// 2) message from a user to a channel the client has joined
+	// 3) notices
+	// 
+
+	
 });
+
+client.on('end', function() {
+	console.log("Connection to irc closed");
+})
+
+function handleServerData(data) {
+	let command = getServerMessageType(data);
+
+	if (null != command) {
+		write(command.create(data));
+	}
+}
+
+function getServerMessageType(str) {
+	console.log("88: " + str);
+	if (null == str || str.length === 0) {
+		throw "Received no data from server";
+	}
+
+	let isServerMessage = str.indexOf(':') === 0;
+
+	if (isServerMessage) {
+		return null;
+	} else {
+ 		let command = new Command();
+ 		return ReplyFactory.create(command.parseCommandPart(str));
+	}
+}
 
 function getCommand(commandStr) {
 	let c = new Command();

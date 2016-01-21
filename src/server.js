@@ -6,10 +6,19 @@ import webpack from 'webpack';
 
 import config from '../webpack.config';
 import bodyParser from 'body-parser';
-
+import net from 'net';
 const app = express();
+var http = require('http').Server(app);
 const compiler = webpack(config);
 const port = 8888;
+
+var io = require('socket.io')(http);
+
+import IrcService from './services/ircService';
+
+let client = null;
+
+let ircService = null;
 
 app.use(require('webpack-dev-middleware')(compiler, {
   noInfo: false,
@@ -26,18 +35,30 @@ app.get('/api/irc', function(req, res, next) {
     });
 });
 
-
 app.get('*', function(req, res, next) {
   res.sendFile(path.join(__dirname, '/../web/index.dev.html'));
 });
 
-
-app.listen(port, 'localhost', function(err) {
-  if (err) {
-    console.log(err);
-    return;
-  }
-
-  console.log('Listening at http://localhost:' + port);
+http.listen(port, function(){
+  console.log('listening on *:' + port);
 });
 
+io.on('connection', function(socket){
+    console.log('a user connected');
+
+    socket.on('message', function(message) {
+        ircService.processInput(message);
+    });
+
+    socket.on('app-command', function(data) {
+
+        console.log('app-command: ' + JSON.stringify(data));
+
+        if (data.command == 'connect') {
+            client = new net.Socket();
+            ircService = new IrcService(client, io);
+            console.log("Connecting to irc...");
+            ircService.connect(data.nick, data.host, data.port);
+        }
+    });
+});

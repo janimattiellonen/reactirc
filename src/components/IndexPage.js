@@ -1,15 +1,62 @@
 import React from 'react';
+import {Button} from 'react-bootstrap';
+import ButtonPanel from './ButtonPanel';
+import UserPanel from './UserPanel';
+import Window from './Window';
+import LoginWindow from './LoginWindow';
+import InputPanel from './InputPanel';
+import Topic from './Topic';
 
+export default class IndexPage extends React.Component {
 
-const IndexPage = props => {
+    constructor(props) {
+        super(props);
+    }
 
+    render() {
+        const {connected} = this.props;
 
-    return (
+        return (    
+            <div className="component">
+                
+                {this.renderContents()}
+            </div>
+        );
+    }
 
-        <section>
-            <div>Foo</div>
-        </section>
-    );
-};
+    renderContents() {
+        const {connected} = this.props;
 
-export default IndexPage;
+        if (connected) {
+            return this.renderIrcWindow();
+        } else {
+            return this.renderLoginWindow();
+        }
+    }
+
+    renderIrcWindow() {
+        const {processMessage, setCurrentChannel, currentChannel, messages, channels, connected, users, topic} = this.props;
+
+        return (
+            <div className="wrapper">
+                <Topic topic={topic} />
+                <Window messages={messages} />
+                <UserPanel users={users}/>
+                <InputPanel onSendMessage={processMessage}/>
+                <ButtonPanel onButtonClick={setCurrentChannel} currentChannel={currentChannel} channels={channels}/>
+            </div>
+        )
+    }
+
+    renderLoginWindow() {
+        const {connectToIrc} = this.props;
+
+        return (
+            <LoginWindow connectToIrc={connectToIrc} />
+        )
+    }
+}
+
+IndexPage.defaultProps = {
+    topic: 'No topic set'
+}

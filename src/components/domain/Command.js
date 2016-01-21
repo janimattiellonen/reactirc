@@ -1,28 +1,10 @@
+import MessageParser from './MessageParser';
+
 export class Command {
-	
-	parseCommandPart(str) {
-		str = str.trim();
-		str = str.substring(1, str.length);
-
-		let pos = str.indexOf(' ');
-
-		if (pos === -1) {
-			return str;
-		}
-
-		return str.substring(0, pos);
+	constructor() {
+		this.parser = new MessageParser();
 	}
 
-	parseMessagePart(str) {
-		let commandPart = this.parseCommandPart(str);
-		let pos = str.indexOf(' ');
-
-		if (pos === -1) {
-			return null;
-		}
-
-		return str.substring(commandPart.length + 2, str.length);
-	}
 }
 
 export class CommandFactory {
@@ -30,6 +12,8 @@ export class CommandFactory {
 		switch (command) {
 			case 'JOIN':
 				return new JoinCommand();
+			case 'PART':
+				return new PartCommand();
 			case 'NICK': 
 				return new NickCommand();
 			case 'USER':
@@ -42,7 +26,7 @@ export class CommandFactory {
 
 export class NickCommand extends Command {
 	create(str) {
-		let nick = 'NICK ' + this.parseMessagePart(str);
+		let nick = 'NICK ' + this.parser.parseMessagePart(str);
 
 		return nick;
 	}
@@ -56,8 +40,39 @@ export class UserCommand extends Command {
 
 export class JoinCommand extends Command {
 	create(str) {
-		let join = 'JOIN ' + this.parseMessagePart(str);
+		let join = 'JOIN ' + this.parser.parseMessagePart(str);
 
 		return join;
+	}
+}
+
+export class PartCommand extends Command {
+	create(str, channelName = null) {
+		let part = this.parser.parsePartCommand(str, true);
+		return part.substring(1, part.length);
+	}
+}
+
+// Reply stuff
+
+export class ReplyFactory {
+	static create(type) {
+		switch (type) {
+			case 'PING':
+				return new PongReply();
+			default:
+				throw "Unknown reply: " + type;
+
+		}
+	}
+}
+
+export class Reply extends Command {
+
+}
+
+export class PongReply extends Reply {
+	create(str) {
+		return 'PONG ' + this.parser.parseMessagePart(str);
 	}
 }
