@@ -33,21 +33,7 @@ export default class IrcService {
 
 			let messages = List(data.match(/[^\r\n]+/g));
 
-			console.log("messages length: " + messages.length);
-			console.log("messages: " + messages);
-
 			messages.filter(m => m != null).map(message => this.handleServerData(message));
-
-			//this.handleServerData(data.toString());
-			//this.io.emit('server-message', data.toString());
-			// PING :irc.example.net
-			// message types that the server sends to the client:
-			// 1) message from another user (private message)
-			// 2) message from a user to a channel the client has joined
-			// 3) action done by another user:
-			// 		:jme!~jme@localhost TOPIC #foo :Mah topic 	
-			// 4) action done by the server
-			// 		:irc.example.net 001 jme2 :Welcome to the Internet Relay Network jme2!~jme2@localhost :irc.example.Network
 		});
 	}
 
@@ -61,7 +47,6 @@ export default class IrcService {
 				// begins with a '/'
 				if (this.parser.isUserCommand(input)) {
 					let command = this.parser.parseCommandPart(input);
-					console.log("command:" + command + ":");
 
 					let func = this.createUserCommand(command);
 
@@ -97,7 +82,6 @@ export default class IrcService {
 			return;
 		}
 
-		console.log('handleServerData:' + str + '|')
 		if (this.parser.isServerCommand(str)) {
 			// PING :irc.example.net
 			let cmdStr = ReplyFactory.create(this.parser.parseCommandPart(str)).create(str);
@@ -106,7 +90,6 @@ export default class IrcService {
 			// :irc.example.net 001 jme2 :Welcome to the Internet Relay Network jme2!~jme2@localhost :irc.example.net
 			let serverMessageObj = this.parser.parseServerFirstResponseMessage(str);
 			this.io.emit('server-message', serverMessageObj.message); // 1
-			console.log("REPLY NUMBER: " + this.parser.getReplyNumber(str));
 			switch (this.parser.getReplyNumber(str)) {
 				case IrcConstants.RPL_WELCOME: 		// 001
 				case IrcConstants.RPL_YOURHOST: 	// 002
@@ -118,7 +101,6 @@ export default class IrcService {
 				case IrcConstants.RPL_TOPIC: 		// 332
 
 					let info = this.parser.parseChannelTopic(str);
-					console.log("=====" + JSON.stringify(info));
 					// :irc.example.net 332 jme2 #foo :Mah topic
 					// example of how data could be sent
 					// may need to serialize object as JSON
@@ -133,9 +115,6 @@ export default class IrcService {
 				case IrcConstants.RPL_NAMREPLY: 		// 353
 					// :irc.example.net 353 jme2 = #foo :jme2 @jme
 					let userList = this.parser.parseUserList(str);
-
-					console.log("parsing user list: " + JSON.stringify(userList));
-
 					this.io.emit('channel-users', userList);
 					break;
 				case IrcConstants.RPL_ENDOFNAMES: 	// 366
@@ -155,8 +134,6 @@ export default class IrcService {
 			*/
 
 		} else if (this.parser.isUserMessage(str)) {
-
-			console.log("======= THIS IS a user message: " + str);
 			this.io.emit('server-message', str); 
 			// :jme!~jme@localhost TOPIC #foo :Mah topic 
 			// :jme!~jme@localhost PRIVMSG jme2 :Hey
@@ -171,7 +148,6 @@ export default class IrcService {
 	}
 
 	write(str) {
-		console.log("IrcService::write():" + str + "|");
 		this.socket.write(str + "\r\n");
 	}
 

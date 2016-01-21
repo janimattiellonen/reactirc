@@ -2,8 +2,6 @@ import { List, Map} from 'immutable';
 import uuid from 'node-uuid';
 import moment from 'moment';
 
-console.log("loading irc-reducers");
-
 import {
 	INIT_CONNECTION,
     SET_CONNECTED,
@@ -38,14 +36,13 @@ function channelStructure() {
 }
 
 export default function(state = defaultState, action) {
-	console.log("type: " + action.type)
     switch (action.type) {
     	case INIT_CONNECTION:
     		return {
                 ...state,
                 io: action.payload
             }
-            
+
     		break;
         case SET_CONNECTED: 
             return {
@@ -130,7 +127,7 @@ export default function(state = defaultState, action) {
         case SET_CHANNEL_USERS: 
             var channel = null;
             var channels = state.channels;
-            console.log("SET_CHANNEL_USERS: channel exists for " + action.payload.channel + ": " + channels.has(action.payload.channel));
+
             if (!channels.has(action.payload.channel)) {
                 channel = {
                     name: action.payload.channel,
@@ -141,7 +138,7 @@ export default function(state = defaultState, action) {
             }
 
             channels = channels.set(action.payload.channel, channel);
-            console.log("SET_CHANNEL_USERS, channels: " + JSON.stringify(channels));
+
             return {
                 ...state,
                 channels: channels,
@@ -151,7 +148,7 @@ export default function(state = defaultState, action) {
         case SET_CURRENT_CHANNEL:
 
             var channel = state.channels.get(action.payload);
-            console.log("SET_CURRENT_CHANNEL: " + JSON.stringify(channel.messages));
+
             return {
                 ...state,
                 activeChannel: action.payload,

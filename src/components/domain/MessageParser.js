@@ -80,7 +80,6 @@ export default class MessageParser {
 	}
 
 	parseMessagePart(str) {
-		console.log("parseMessagePart1|" + m + "|");
 		let commandPart = this.parseCommandPart(str);
 		let pos = str.indexOf(' ');
 
@@ -88,11 +87,7 @@ export default class MessageParser {
 			return null;
 		}
 
-		let m = str.substring(commandPart.length + 2, str.length);
-
-		console.log("parseMessagePart|" + m + "|");
-
-		return m;
+		return str.substring(commandPart.length + 2, str.length);;
 	}
 
 	parseServerFirstResponseMessage(str) {
@@ -207,24 +202,5 @@ export default class MessageParser {
 		};
 
 		return userMessage;
-		/*
-		// :jme!~jme@localhost PRIVMSG #foo :foobar
-		userMessage = {
-			sender: 'jme',
-			senderHost: 'jme@localhost',
-			command: 'PRIVMSG',
-			receiver: '#foo',
-			message: 'foobar'
-		};
-
-		// :jme!~jme@localhost TOPIC #foo :Mah topic 
-		userMessage = {
-			sender: 'jme',
-			senderHost: 'jme@localhost',
-			command: 'TOPIC',
-			receiver: '#foo',
-			message: 'Mah topic'
-		};
-		*/
 	}
 }

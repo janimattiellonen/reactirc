@@ -58,7 +58,6 @@ export default class LoginWindow extends React.Component {
     }
 
     onLogin() {
-        console.log("state: " + JSON.stringify(this.state));
         this.props.connectToIrc(this.state.nick, this.state.host, this.state.port);
     }
 }

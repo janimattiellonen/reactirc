@@ -17,7 +17,6 @@ process.stdin.on('data', function (input) {
 		input = input.replace(/\r?\n|\r/g,"");
 
 		let command = getCommand(input);
-		console.log("cc:" + command + ":");
 
 	    if (command == 'connect') {
 	    	connect();	
@@ -52,17 +51,14 @@ client.on('data', function(data) {
 });
 
 client.on('end', function() {
-	console.log("=============Received rest from server...");
-	//handleServerData(receivedData);
+	console.log("Connection to irc closed");
 })
 
 function handleServerData(data) {
 	let command = getServerMessageType(data);
 
 	if (null != command) {
-		let cmdStr = command.create(data);
-		console.log("ppp: " + cmdStr);
-		write(cmdStr);
+		write(command.create(data));
 	}
 }
 
@@ -78,7 +74,6 @@ function getServerMessageType(str) {
 		return null;
 	} else {
  		let command = new Command();
- 		console.log("99");
  		return ReplyFactory.create(command.parseCommandPart(str));
 	}
 }

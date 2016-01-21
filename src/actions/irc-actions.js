@@ -21,14 +21,10 @@ let parser = new MessageParser();
 
 export function initIoConnection() {
 	return function(dispatch, getState) {
-		console.log("initIoConnection");
-
 		if (null == socket || !socket.isConnected) {
 			socket = io('http://localhost:8888');
 
 			socket.on('server-message', (data) => {
-				console.log("Server responded with: " + data);
-
 				dispatch(receiveMessage(data));
 			});
 
@@ -52,8 +48,6 @@ export function initIoConnection() {
 			});
 
 			socket.on('channel-topic', (data) => {
-				console.log("channel-topic: " + JSON.stringify(data));
-
 				dispatch(setChannelTopic(data));
 			});
 
@@ -77,10 +71,8 @@ export function setConnected(state) {
 }
 
 export function connectToIrc(nick, host, port) {
-	console.log("1 nick: " + nick + ", host: " + host + ", port: " + port);
 	return function(dispatch, getState) {
 		const io = getState().irc.io;
-		console.log("2 nick: " + nick + ", host: " + host + ", port: " + port);
 		io.emit('app-command', {
 			command: 'connect',
 			nick: nick,
@@ -104,8 +96,6 @@ export function setCurrentNick(nick) {
 export function processMessage(message) {
 	return function (dispatch, getState) {
 		if (parser.isUserCommand(message)) {
-			console.log(message + ' is a user command');
-
 			let cmd = parser.parseCommandPart(message);
 
 			switch (cmd) {

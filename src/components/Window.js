@@ -11,9 +11,8 @@ export default class Window extends React.Component {
 	}
 
     render() {
-
     	const {messages} = this.props;
-        console.log(JSON.stringify(messages));
+
         return (
             <div className="window">
         		{messages.map((message, i) => 
