@@ -38,17 +38,10 @@ function channelStructure() {
 }
 
 function sortUsers(users) {
-    return _.sortByOrder(users, ['nick']);
-}
+    const ops = List(users).filter(user => user.op == true).sortBy(user => user.nick);
+    const normal = List(users).filter(user => user.op != true).sortBy(user => user.nick);
 
-function compare(a, b) {
-    if (a.nick < b.nick) {
-        return -1;
-    } else if (a.nick > b.nick){
-        return 1;
-    } else {
-        return 0;
-    }
+    return ops.concat(normal);
 }
 
 export default function(state = defaultState, action) {
@@ -163,8 +156,8 @@ export default function(state = defaultState, action) {
             console.log("bb: " + action.payload.channel);
             console.log("JJJ: " + JSON.stringify(channels));
 
-            var users = List(action.payload.users.sort(compare));
-
+            var users = sortUsers(action.payload.users);
+            console.log("USERS: " + JSON.stringify(users));
             channel = channels.get(action.payload.channel)
             channel.users = users;
             channels = channels.set(action.payload.channel, channel);
