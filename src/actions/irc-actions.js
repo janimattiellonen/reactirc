@@ -42,9 +42,15 @@ export function initIoConnection() {
 					}
 					break;
 					case 'PART':
-					console.log("PART: " + JSON.stringify(userMessage));
 						dispatch(userPartsChannel(userMessage.sender, userMessage.receiver));
-					break;
+						break;
+					case 'TOPIC':
+						// userMessage: {"sender":"jme","senderHost":"jme@localhost","command":"TOPIC","receiver":"#foo","message":"Kissa"}
+						dispatch(setChannelTopic({
+							channelName: userMessage.receiver,
+							topic: userMessage.message
+						}));
+						break;
 					default:
 						console.log("Client: unknown user message command: " + userMessage.command);
 					break;
@@ -129,7 +135,6 @@ export function processMessage(message) {
 				break;
 			}
 		} else {
-			console.log("sender: " + getState().irc.nick);
 			dispatch(messageToChannel({
 				message: message,
 				receiver: getState().irc.activeChannel,

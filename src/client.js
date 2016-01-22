@@ -3,7 +3,6 @@ import $ from 'jquery';
 window.jQuery = require('jquery');
 window.$ = window.jQuery;
 
-import './client.less';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import store from './store';
@@ -15,6 +14,8 @@ import { createHistory } from 'history';
 
 require('bootstrap/dist/css/bootstrap.css');
 require('bootstrap/dist/js/bootstrap.js');
+import './client.less';
+
 
 const app = (
     <Provider store={store}>

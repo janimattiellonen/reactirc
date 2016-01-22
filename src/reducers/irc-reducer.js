@@ -123,13 +123,10 @@ export default function(state = defaultState, action) {
 
             break;
         case USER_PARTS_CHANNEL:
-            console.log(USER_PARTS_CHANNEL + ": " + JSON.stringify(action.payload));
-            console.log(USER_PARTS_CHANNEL + " 2: " + JSON.stringify(action.payload.nick));
             var channels = state.channels;
             var channel = channels.get(action.payload.channelName);
 
             channel.users = channel.users.filter(user => user.nick != action.payload.nick);
-            console.log("ooo: " + JSON.stringify(channel.users));
 
             return {
                 ...state,
@@ -146,18 +143,14 @@ export default function(state = defaultState, action) {
             return {
                 ...state,
                 channels: channels.set(action.payload.channelName, channel),
-                topic: action.payload.topic
+                topic: action.payload.channelName == state.activeChannel ? action.payload.topic : state.topic
             }
             break;
         case SET_CHANNEL_USERS: 
             var channel = null;
             var channels = state.channels;
-            console.log("bba: " + JSON.stringify(action.payload));
-            console.log("bb: " + action.payload.channel);
-            console.log("JJJ: " + JSON.stringify(channels));
 
             var users = sortUsers(action.payload.users);
-            console.log("USERS: " + JSON.stringify(users));
             channel = channels.get(action.payload.channel)
             channel.users = users;
             channels = channels.set(action.payload.channel, channel);
@@ -169,9 +162,8 @@ export default function(state = defaultState, action) {
             }
             break; 
         case SET_CURRENT_CHANNEL:
-
             var channel = state.channels.get(action.payload);
-            console.log("channel: " + JSON.stringify(channel));
+            
             return {
                 ...state,
                 activeChannel: action.payload,
