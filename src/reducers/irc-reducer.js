@@ -1,6 +1,7 @@
 import { List, Map} from 'immutable';
 import uuid from 'node-uuid';
 import moment from 'moment';
+import _ from 'lodash';
 
 import {
 	INIT_CONNECTION,
@@ -34,6 +35,20 @@ function channelStructure() {
         messages: List(),
         users: List()
     };
+}
+
+function sortUsers(users) {
+    return _.sortByOrder(users, ['nick']);
+}
+
+function compare(a, b) {
+    if (a.nick < b.nick) {
+        return -1;
+    } else if (a.nick > b.nick){
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 export default function(state = defaultState, action) {
@@ -144,43 +159,22 @@ export default function(state = defaultState, action) {
         case SET_CHANNEL_USERS: 
             var channel = null;
             var channels = state.channels;
+            console.log("bba: " + JSON.stringify(action.payload));
             console.log("bb: " + action.payload.channel);
             console.log("JJJ: " + JSON.stringify(channels));
 
+            var users = List(action.payload.users.sort(compare));
+
             channel = channels.get(action.payload.channel)
-            channel.users = List(action.payload.users);
-
+            channel.users = users;
             channels = channels.set(action.payload.channel, channel);
 
             return {
                 ...state,
                 channels: channels,
-                users: List(action.payload.users)
+                users: users
             }
-            break;
-
-        case 'ugh': 
-            var channel = null;
-            var channels = state.channels;
-
-            if (!channels.has(action.payload.channel)) {
-                channel = {
-                    name: action.payload.channel,
-                    users: action.payload.users
-                }
-            } else {
-                channel = channels.get(action.payload.channel);
-            }
-
-            channels = channels.set(action.payload.channel, channel);
-
-            return {
-                ...state,
-                channels: channels,
-                users: List(action.payload.users)
-            }
-            break;     
-
+            break; 
         case SET_CURRENT_CHANNEL:
 
             var channel = state.channels.get(action.payload);
