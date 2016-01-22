@@ -7,26 +7,27 @@ import {List} from 'immutable';
 
 export default class IrcService {
 
-	constructor(socket, io) {
-		this.socket 	= socket;
+	constructor(client, io, socket) {
+		this.client 	= client;
 		this.io 		= io;
+		this.socket 	= socket;
 		this.parser 	= new MessageParser();
 		this.command 	= new Command();
 	}
 
 	connect(nick, host, port) {
 
-		this.socket.on('uncaughtException', (err) => {
+		this.client.on('uncaughtException', (err) => {
 			console.log("UNCAUGHT EXCEPTION: " + err);
 		});
 
-		this.socket.connect(port, host, () => {
+		this.client.connect(port, host, () => {
 			console.log('Connected');
 ;
 			this.sendNick('/NICK ' + nick);
 		});
 
-		this.socket.on('data', (data) => {
+		this.client.on('data', (data) => {
 			console.log("FROM SERVER: " + data.toString().trim() + "|");
 
 			data = data.toString().trim();
@@ -89,14 +90,14 @@ export default class IrcService {
 		} else if (this.parser.isServerMessage(str)) {
 			// :irc.example.net 001 jme2 :Welcome to the Internet Relay Network jme2!~jme2@localhost :irc.example.net
 			let serverMessageObj = this.parser.parseServerFirstResponseMessage(str);
-			this.io.emit('server-message', serverMessageObj.message); // 1
+			this.io.to(this.socket.id).emit('server-message', serverMessageObj.message); // 1
 			switch (this.parser.getReplyNumber(str)) {
 				case IrcConstants.RPL_WELCOME: 		// 001
 				case IrcConstants.RPL_YOURHOST: 	// 002
 				case IrcConstants.RPL_CREATED: 		// 003
 				case IrcConstants.RPL_MYINFO: 		// 004
 				case IrcConstants.RPL_BOUNCE: 		// 005s
-					this.io.emit('server-message', serverMessageObj.message); // 2
+					this.io.to(this.socket.id).emit('server-message', serverMessageObj.message); // 2
 					break;
 				case IrcConstants.RPL_TOPIC: 		// 332
 
@@ -104,7 +105,7 @@ export default class IrcService {
 					// :irc.example.net 332 jme2 #foo :Mah topic
 					// example of how data could be sent
 					// may need to serialize object as JSON
-					this.io.emit('channel-topic', {
+					this.io.to(this.socket.id).emit('channel-topic', {
 						channelName: info.channelName,
 						topic: info.topic
 					});
@@ -115,7 +116,7 @@ export default class IrcService {
 				case IrcConstants.RPL_NAMREPLY: 		// 353
 					// :irc.example.net 353 jme2 = #foo :jme2 @jme
 					let userList = this.parser.parseUserList(str);
-					this.io.emit('channel-users', userList);
+					this.io.to(this.socket.id).emit('channel-users', userList);
 					break;
 				case IrcConstants.RPL_ENDOFNAMES: 	// 366
 					// :irc.example.net 366 jme2 #foo :End of NAMES list
@@ -134,13 +135,13 @@ export default class IrcService {
 			*/
 
 		} else if (this.parser.isUserMessage(str)) {
-			this.io.emit('server-message', str); 
+			this.io.to(this.socket.id).emit('server-message', str); 
 			// :jme!~jme@localhost TOPIC #foo :Mah topic 
 			// :jme!~jme@localhost PRIVMSG jme2 :Hey
 			// :jme!~jme@localhost PRIVMSG #foo :foobar
 			let userMessage = this.parser.parseUserMessage(str);
 			console.log("userMessage: " + JSON.stringify(userMessage));
-			this.io.emit('user-message', userMessage);
+			this.io.to(this.socket.id).emit('user-message', userMessage);
 		} else if (this.parser.isUserPrivateMessage(str)) {
 			// probably ignore this
 		}
@@ -149,7 +150,7 @@ export default class IrcService {
 	}
 
 	write(str) {
-		this.socket.write(str + "\r\n");
+		this.client.write(str + "\r\n");
 	}
 
 	// rest of methods below are mapped to user commands received from a client

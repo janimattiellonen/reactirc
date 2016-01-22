@@ -91,6 +91,8 @@ export function connectToIrc(nick, host, port) {
 			port: port
 		});
 
+		dispatch(setCurrentNick(nick));
+		
 		// this assumes connection is ok
 		// we should set connection status depending on success rate
 		return dispatch(setConnected(true));
@@ -127,6 +129,7 @@ export function processMessage(message) {
 				break;
 			}
 		} else {
+			console.log("sender: " + getState().irc.nick);
 			dispatch(messageToChannel({
 				message: message,
 				receiver: getState().irc.activeChannel,
