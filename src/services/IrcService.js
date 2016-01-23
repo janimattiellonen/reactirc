@@ -5,6 +5,8 @@ import * as IrcConstants from '../components/domain/constants';
 
 import {List} from 'immutable';
 
+const MAX_MESSAGE_LENGTH = 512;
+
 export default class IrcService {
 
 	constructor(client, io, socket) {
@@ -100,7 +102,7 @@ export default class IrcService {
 					this.io.to(this.socket.id).emit('server-message', serverMessageObj.message); // 2
 					break;
 				case IrcConstants.RPL_TOPIC: 		// 332
-
+					// userMessage: {"sender":"jme","senderHost":"jme@localhost","command":"TOPIC","receiver":"#foo","message":"Kissa"}
 					let info = this.parser.parseChannelTopic(str);
 					// :irc.example.net 332 jme2 #foo :Mah topic
 					// example of how data could be sent
@@ -135,6 +137,7 @@ export default class IrcService {
 			*/
 
 		} else if (this.parser.isUserMessage(str)) {
+			// this is more for debugging purposes
 			this.io.to(this.socket.id).emit('server-message', str); 
 			// :jme!~jme@localhost TOPIC #foo :Mah topic 
 			// :jme!~jme@localhost PRIVMSG jme2 :Hey
@@ -150,7 +153,14 @@ export default class IrcService {
 	}
 
 	write(str) {
-		this.client.write(str + "\r\n");
+		let line = str + "\r\n";
+
+		if (line.length > MAX_MESSAGE_LENGTH) {
+			this.io.to(this.socket.id).emit('server-message', 'Message is too long ( ' + line.length +'). Exceeds limit of ' + MAX_MESSAGE_LENGTH); 
+			return;
+		}
+
+		this.client.write(line);
 	}
 
 	// rest of methods below are mapped to user commands received from a client

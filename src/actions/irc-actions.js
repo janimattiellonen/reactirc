@@ -2,6 +2,8 @@ import axios from 'axios';
 import { List } from 'immutable';
 import io from 'socket.io-client';
 import MessageParser from '../components/domain/MessageParser';
+import { pushPath } from 'redux-simple-router';
+
 
 export const INIT_CONNECTION 		= 'INIT_CONNECTION';
 export const SET_CONNECTED			= 'SET_CONNECTED';
@@ -98,10 +100,15 @@ export function connectToIrc(nick, host, port) {
 		});
 
 		dispatch(setCurrentNick(nick));
+		dispatch(setConnected(true))
 		
 		// this assumes connection is ok
 		// we should set connection status depending on success rate
-		return dispatch(setConnected(true));
+
+		//const { state } = getState().routing;
+        //const next = state.next || '/';
+        console.log("about to go to '/'");
+		return dispatch(pushPath('/', {}));
 	}
 }
 

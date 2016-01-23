@@ -3,6 +3,7 @@ import { List, Map} from 'immutable';
 
 import express from 'express';
 import webpack from 'webpack';
+import path from 'path';
 
 import config from '../webpack.config';
 import bodyParser from 'body-parser';

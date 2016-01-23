@@ -19,6 +19,10 @@ export default class ButtonPanel extends React.Component {
                 {this.props.children}
 
                 <div className="btn-group" data-toggle="buttons">
+                    <label onClick={this.onClick.bind(this, 'INFO')} className="btn btn-default">
+                        <input key="0" type="radio" name="options" data-id="info" autocomplete="off" /> Info
+                    </label>
+
                     {channels.map((channel, i) => {
                         return (
                             <label onClick={this.onClick.bind(this, channel.name)}className="btn btn-default">
