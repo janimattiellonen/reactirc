@@ -16,6 +16,7 @@ export const SET_CHANNEL_USERS		= 'SET_CHANNEL_USERS';
 export const SET_CURRENT_CHANNEL	= 'SET_CURRENT_CHANNEL';
 export const JOIN_CHANNEL			= 'JOIN_CHANNEL';
 export const PART_CHANNEL			= 'PART_CHANNEL';
+export const USER_JOINS_CHANNEL		= 'USER_JOINS_CHANNEL';
 export const USER_PARTS_CHANNEL		= 'USER_PARTS_CHANNEL';
 export const MESSAGE_TO_CHANNEL		= 'MESSAGE_TO_CHANNEL';
 
@@ -32,7 +33,7 @@ export function initIoConnection() {
 			});
 
 			socket.on('user-message', (userMessage) => {
-
+				console.log("LUTS user-message: " + JSON.stringify(userMessage));
 				// let's first test this way and later on refactor
 				switch (userMessage.command) {
 					case 'PRIVMSG':
@@ -43,6 +44,10 @@ export function initIoConnection() {
 						// private message to another user
 					}
 					break;
+					case 'JOIN': 
+						console.log("JOIN (2): " + JSON.stringify(userMessage));
+						dispatch(userJoinsChannel(userMessage.sender, userMessage.receiver));
+						break;
 					case 'PART':
 						dispatch(userPartsChannel(userMessage.sender, userMessage.receiver));
 						break;
@@ -57,12 +62,11 @@ export function initIoConnection() {
 						console.log("Client: unknown user message command: " + userMessage.command);
 					break;
 				}
-				
-
 			});
 
 			// according to irc rfc1459, the user is allowed to join a channel, if the client receives a user list
 			socket.on('channel-users', (data) => {
+				console.log('socket:channel-users: ' + JSON.stringify(data));
 				dispatch(setChannelUsers(data));
 			});
 
@@ -157,6 +161,17 @@ export function processMessage(message) {
 	}
 }
 
+export function activateButton(buttonId) {
+	console.log("activateButton, buttonId: " + buttonId);
+	return function (dispatch, getState) {
+		if (buttonId.indexOf('#') === 0) {
+			return dispatch(setCurrentChannel(buttonId));
+		} else {
+
+		}
+	}
+}
+
 export function messageToChannel(userMessage) {
 	return {
 		type: MESSAGE_TO_CHANNEL,
@@ -192,6 +207,20 @@ export function userPartsChannel(nick, channelName) {
     		channelName: channelName
     	}
     };
+}
+
+export function userJoinsChannel(nick, channelName) {
+	console.log(`reducer, nick: ${nick}, channel: ${channelName}`);
+	return {
+		type: USER_JOINS_CHANNEL,
+		payload: {
+			user: {
+				nick: nick,
+				op: false
+			},
+			channelName: channelName
+		}
+	};
 }
 
 export function receiveMessage(message) {

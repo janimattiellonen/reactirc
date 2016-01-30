@@ -163,12 +163,7 @@ export default class MessageParser {
 
 		let parts = str.split(' ');
 
-		let users = List(str.substring(str.indexOf(':') + 1, str.length).split(' ')).map(user => {
-			return {
-				op: user.indexOf('@') === 0,
-				nick: user.replace('@', '')
-			};
-		}).toList();
+		let users = this.parseUsers(List(str.substring(str.indexOf(':') + 1, str.length).split(' ')));
 
 		let info = {
 			prefix: parts[0],
@@ -180,6 +175,15 @@ export default class MessageParser {
 		return info;	
 	}
 
+	parseUsers(users) {
+		return users.map(user => {
+			return {
+				op: user.indexOf('@') === 0,
+				nick: user.replace('@', '')
+			};
+		}).toList();
+	}
+
 	removeMessageIndicator(str) {
 		return str.indexOf(':') === 0 ? str.substring(1, str.length) : str;
 	}
@@ -189,8 +193,14 @@ export default class MessageParser {
 
 		let sender = str.substring(0, str.indexOf('!'));
 		let senderHost = str.substring(str.indexOf('!~') + 2, str.indexOf(' '));
-		let command = str.split(' ')[1]
-		let receiver = str.split(' ')[2]
+		let command = str.split(' ')[1];
+		let receiver = str.split(' ')[2];
+
+		if (command == 'JOIN') {
+			// for some reason JOIN messages have a ':' before the '#' (:jme!~jme@localhost JOIN :#bar)
+			receiver = receiver.substring(1, receiver.length); // strip out the ':'
+		}
+
 		let message = str.substring(sender.length + senderHost.length + command.length + receiver.length + 6, str.length);
 
 		let userMessage = {

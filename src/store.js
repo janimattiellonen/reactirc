@@ -2,9 +2,8 @@ import { createStore as reduxCreateStore, applyMiddleware, combineReducers } fro
 import thunk from 'redux-thunk';
 import { routeReducer, syncReduxAndRouter } from 'redux-simple-router';
 
-import * as reducers from './reducers';
 
-export function createStore(history) {
+export function createStore(reducers, history) {
 	const createStoreWithMiddleware = applyMiddleware(
 	  thunk
 	)(reduxCreateStore);

@@ -14,6 +14,7 @@ import {
     JOIN_CHANNEL,
     PART_CHANNEL,
     MESSAGE_TO_CHANNEL,
+    USER_JOINS_CHANNEL,
     USER_PARTS_CHANNEL
 } from '../actions/irc-actions';
 
@@ -122,6 +123,21 @@ export default function(state = defaultState, action) {
             }
 
             break;
+        case USER_JOINS_CHANNEL: 
+            var channels = state.channels;
+            var channel = channels.get(action.payload.channelName);
+            var user = action.payload.user;
+            var users = sortUsers(channel.users.push(user).toArray());
+            
+            channel.users = users;
+
+            return {
+                ...state,
+                channels: channels.set(channel.name, channel),
+                users: users
+            }
+
+            break; 
         case USER_PARTS_CHANNEL:
             var channels = state.channels;
             var channel = channels.get(action.payload.channelName);
@@ -163,10 +179,11 @@ export default function(state = defaultState, action) {
             break; 
         case SET_CURRENT_CHANNEL:
             var channel = state.channels.get(action.payload);
-            
+            console.log("SET_CURRENT_CHANNEL: " + action.payload + ", " + JSON.stringify(channel))
+
             return {
                 ...state,
-                activeChannel: action.payload,
+                activeChannel: channel.name,
                 messages: channel.messages,
                 users: channel.users,
                 topic: channel.topic

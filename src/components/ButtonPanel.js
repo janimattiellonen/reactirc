@@ -1,5 +1,6 @@
 import React from 'react';
 import io from 'socket.io-client';
+import classNames from 'classnames';
 
 export default class ButtonPanel extends React.Component {
     constructor(props) {
@@ -12,7 +13,7 @@ export default class ButtonPanel extends React.Component {
 
     render() {
 
-        const {channels, onButtonClick} = this.props;
+        const {channels, onButtonClick, currentChannel} = this.props;
 
         return (
             <div className="button-panel">
@@ -25,7 +26,7 @@ export default class ButtonPanel extends React.Component {
 
                     {channels.map((channel, i) => {
                         return (
-                            <label onClick={this.onClick.bind(this, channel.name)}className="btn btn-default">
+                            <label onClick={this.onClick.bind(this, channel.name)} className={classNames('btn', 'btn-default', {active: channel.name == currentChannel})}>
                                 <input key={i} type="radio" name="options" data-id={channel.name} autocomplete="off" /> {channel.name} 
                             </label>
                         )

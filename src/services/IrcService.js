@@ -142,6 +142,7 @@ export default class IrcService {
 			// :jme!~jme@localhost TOPIC #foo :Mah topic 
 			// :jme!~jme@localhost PRIVMSG jme2 :Hey
 			// :jme!~jme@localhost PRIVMSG #foo :foobar
+			// :jme!~jme@localhost JOIN :#bar
 			let userMessage = this.parser.parseUserMessage(str);
 			console.log("userMessage: " + JSON.stringify(userMessage));
 			this.io.to(this.socket.id).emit('user-message', userMessage);
