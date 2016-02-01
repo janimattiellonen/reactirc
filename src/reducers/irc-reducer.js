@@ -14,6 +14,7 @@ import {
     JOIN_CHANNEL,
     PART_CHANNEL,
     MESSAGE_TO_CHANNEL,
+    NEW_MESSAGE_RECEIVED,
     USER_JOINS_CHANNEL,
     USER_PARTS_CHANNEL
 } from '../actions/irc-actions';
@@ -26,7 +27,8 @@ const defaultState = {
     nick: null,
     currentChannel: null,
     connected: false,
-    topic: null
+    topic: null,
+    newMessageOwner: null
 };
 
 function channelStructure() {
@@ -128,7 +130,7 @@ export default function(state = defaultState, action) {
             var channel = channels.get(action.payload.channelName);
             var user = action.payload.user;
             var users = sortUsers(channel.users.push(user).toArray());
-            
+
             channel.users = users;
 
             return {
@@ -198,7 +200,8 @@ export default function(state = defaultState, action) {
                 message: userMessage.message,
                 timestamp: moment().valueOf(),
                 sender: userMessage.sender,
-                me: userMessage.me != null && userMessage.me == true
+                me: userMessage.me != null && userMessage.me == true,
+                channelName: channel.name
             };
 
             channel.messages = channel.messages.push(newMessage);
@@ -211,6 +214,14 @@ export default function(state = defaultState, action) {
                 ...state,
                 channels: state.channels.set(channel.name, channel),
                 messages: messages
+            }
+            break;
+        case NEW_MESSAGE_RECEIVED:
+            console.log("NEW_MESSAGE_RECEIVED: " + action.payload);
+            
+            return {
+                ...state,
+                newMessageOwner: action.payload
             }
             break;
         default:

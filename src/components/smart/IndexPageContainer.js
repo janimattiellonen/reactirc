@@ -9,7 +9,8 @@ function mapStateToProps(state) {
         currentChannel: state.irc.activeChannel,
         connected: state.irc.connected,
         users: state.irc.users,
-        topic: state.irc.topic
+        topic: state.irc.topic,
+        newMessageOwner: state.irc.newMessageOwner
     }
 }
 

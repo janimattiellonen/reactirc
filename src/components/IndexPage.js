@@ -35,7 +35,7 @@ export default class IndexPage extends React.Component {
     }
 
     renderIrcWindow() {
-        const {processMessage, setCurrentChannel, activateButton, currentChannel, messages, channels, connected, users, topic} = this.props;
+        const {processMessage, setCurrentChannel, activateButton, currentChannel, messages, channels, connected, users, topic, newMessageOwner} = this.props;
 
         return (
             <div className="wrapper">
@@ -43,7 +43,7 @@ export default class IndexPage extends React.Component {
                 <Window messages={messages} />
                 <UserPanel users={users}/>
                 <InputPanel onSendMessage={processMessage}/>
-                <ButtonPanel onButtonClick={activateButton} currentChannel={currentChannel} channels={channels}/>
+                <ButtonPanel onButtonClick={activateButton} currentChannel={currentChannel} channels={channels} newMessageOwner={newMessageOwner} />
             </div>
         )
     }

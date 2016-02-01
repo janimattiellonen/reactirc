@@ -19,6 +19,7 @@ export const PART_CHANNEL			= 'PART_CHANNEL';
 export const USER_JOINS_CHANNEL		= 'USER_JOINS_CHANNEL';
 export const USER_PARTS_CHANNEL		= 'USER_PARTS_CHANNEL';
 export const MESSAGE_TO_CHANNEL		= 'MESSAGE_TO_CHANNEL';
+export const NEW_MESSAGE_RECEIVED	= 'NEW_MESSAGE_RECEIVED';
 
 let socket = null;
 let parser = new MessageParser();
@@ -29,7 +30,7 @@ export function initIoConnection() {
 			socket = io('http://localhost:8888');
 
 			socket.on('server-message', (data) => {
-				dispatch(receiveMessage(data));
+				console.log('server-message: ' + JSON.stringify(data));
 			});
 
 			socket.on('user-message', (userMessage) => {
@@ -165,17 +166,33 @@ export function activateButton(buttonId) {
 	console.log("activateButton, buttonId: " + buttonId);
 	return function (dispatch, getState) {
 		if (buttonId.indexOf('#') === 0) {
+			console.log("lussenhoofer");
 			return dispatch(setCurrentChannel(buttonId));
 		} else {
-
+			console.log("WAS IST DAS?");
 		}
 	}
 }
 
 export function messageToChannel(userMessage) {
+	return function (dispatch, getState) {
+		dispatch(newMessageReceived(userMessage.receiver));
+
+		return dispatch(messageToChannel2(userMessage));
+	}
+}
+
+export function messageToChannel2(userMessage) {
 	return {
 		type: MESSAGE_TO_CHANNEL,
 		payload: userMessage
+	}
+}
+
+export function newMessageReceived(receiver) {
+	return {
+		type: NEW_MESSAGE_RECEIVED,
+		payload: receiver
 	}
 }
 
