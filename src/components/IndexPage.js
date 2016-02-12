@@ -43,7 +43,7 @@ export default class IndexPage extends React.Component {
                 <Window messages={messages} />
                 <UserPanel users={users}/>
                 <InputPanel onSendMessage={processMessage}/>
-                <ButtonPanel onButtonClick={activateButton} currentChannel={currentChannel} channels={channels} newMessageOwner={newMessageOwner} />
+                <ButtonPanel onButtonClick={activateButton} currentChannel={currentChannel} channels={channels} {...this.props} />
             </div>
         )
     }

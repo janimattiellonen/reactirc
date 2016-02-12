@@ -1,5 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
+import moment from 'moment';
 
 export default class IrcButton extends React.Component {
 
@@ -7,50 +8,43 @@ export default class IrcButton extends React.Component {
 		super(props);
 
 		this.state = {
-			markRead: true
+			newMessage: false
 		}
 	}
 
     render() {
-    	const {active, channel, currentChannel, name, newMessageOwner, handleClick} = this.props;
-    	console.log(`name: ${name}, currentChannel: ${currentChannel}, markRead: ${this.state.markRead}`);
+    	const {active, currentChannelName, channelName, newMessageOwner, handleClick} = this.props;
+
     	return (
 	    	<label 
-	    		onClick={this.onClick.bind(this, name)}
-	            className={classNames('btn', 'btn-default', {active: name == currentChannel, 'new-message': newMessageOwner != currentChannel && !this.state.markRead})}>
-	            <input type="radio" name="options" data-id={name} autocomplete="off" /> {name} 
+	    		onClick={this.onClick.bind(this, channelName)}
+	            className={classNames('btn', 'btn-default', {active: channelName == currentChannelName, 'new-message': this.state.newMessage})}>
+	            <input type="radio" name="options" data-id={channelName} autocomplete="off" /> {channelName}
 	        </label>
     	)
     }
 
     componentWillReceiveProps(nextProps) {
-    	console.log("IcButton1: " + JSON.stringify(this.props));
-    	console.log("IcButton2: " + JSON.stringify(nextProps));
+        const {active, currentChannelName, channelName, newMessageOwner} = nextProps;
 
-    	if (this.props.newMessageOwner != nextProps.newMessageOwner) {
-    		if (nextProps.newMessageOwner == this.props.name) {
-    			console.log("NEW MSG FOR THIS CHANNEL");
-    			this.setState({
-    				markRead: false
-    			});
-    		}
-    	}
+        console.log(channelName + ": currentChannelName: " + currentChannelName);
+        console.log(channelName + ": newMessageOwner: " + JSON.stringify(newMessageOwner));
+
+        if (null == this.props.newMessageOwner) {
+            this.setState({
+                newMessage: true
+            });
+        } else if (currentChannelName != channelName && newMessageOwner && channelName == newMessageOwner.receiver && this.props.newMessageOwner.ts != newMessageOwner.ts) {
+            this.setState({
+                newMessage: true
+            });
+        }
     }
-
-
-    shouldComponentUpdate(nextProps, nextState) {
-    	if (nextProps.newMessageOwner == null) {
-    		return false;
-    	}
-
-    	return true;
-    }
-
 
     onClick(id) {
-    	console.log("ccc: " + id);
+        console.log("CLICK: " + id);
     	this.setState({
-    		markRead: true
+    		newMessage: false
     	});
 
     	this.props.handleClick(id);
@@ -59,7 +53,7 @@ export default class IrcButton extends React.Component {
 
 IrcButton.defaultProps = {
     active: false,
-    name: null,
-    currentChannel: null,
+    channelName: null,
+    currentChannelName: null,
     newMessageOwner: null
 }

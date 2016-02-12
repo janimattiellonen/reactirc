@@ -33,6 +33,8 @@ const routes = createRoutes({
 
 const app = createApp(store, history, routes);
 
+import moment from 'moment';
+
 ReactDOM.render(
     app,
     document.getElementById('app')

@@ -1,5 +1,6 @@
 import {List} from 'immutable';
 import _ from 'lodash';
+import moment from 'moment';
 
 export default class MessageParser {
 
@@ -208,7 +209,8 @@ export default class MessageParser {
 			senderHost: senderHost,
 			command: command,
 			receiver: receiver,
-			message: message
+			message: message,
+			ts: moment().format('x')
 		};
 
 		return userMessage;

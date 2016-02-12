@@ -3,7 +3,7 @@ import { List } from 'immutable';
 import io from 'socket.io-client';
 import MessageParser from '../components/domain/MessageParser';
 import { pushPath } from 'redux-simple-router';
-
+import moment from 'moment';
 
 export const INIT_CONNECTION 		= 'INIT_CONNECTION';
 export const SET_CONNECTED			= 'SET_CONNECTED';
@@ -151,7 +151,8 @@ export function processMessage(message) {
 				message: message,
 				receiver: getState().irc.activeChannel,
 				sender: getState().irc.nick,
-				me: true
+				me: true,
+				ts: moment().format('x')
 			}));
 
 			return dispatch(sendMessage({
@@ -163,20 +164,17 @@ export function processMessage(message) {
 }
 
 export function activateButton(buttonId) {
-	console.log("activateButton, buttonId: " + buttonId);
 	return function (dispatch, getState) {
 		if (buttonId.indexOf('#') === 0) {
-			console.log("lussenhoofer");
 			return dispatch(setCurrentChannel(buttonId));
-		} else {
-			console.log("WAS IST DAS?");
 		}
 	}
 }
 
 export function messageToChannel(userMessage) {
 	return function (dispatch, getState) {
-		dispatch(newMessageReceived(userMessage.receiver));
+		console.log("user message: " + JSON.stringify(userMessage));
+		dispatch(newMessageReceived(userMessage));
 
 		return dispatch(messageToChannel2(userMessage));
 	}
@@ -194,6 +192,10 @@ export function newMessageReceived(receiver) {
 		type: NEW_MESSAGE_RECEIVED,
 		payload: receiver
 	}
+}
+
+export function resetNewMessage(receiver) {
+
 }
 
 export function sendMessage(message) {

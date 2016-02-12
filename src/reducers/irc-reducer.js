@@ -181,7 +181,6 @@ export default function(state = defaultState, action) {
             break; 
         case SET_CURRENT_CHANNEL:
             var channel = state.channels.get(action.payload);
-            console.log("SET_CURRENT_CHANNEL: " + action.payload + ", " + JSON.stringify(channel))
 
             return {
                 ...state,
@@ -216,9 +215,7 @@ export default function(state = defaultState, action) {
                 messages: messages
             }
             break;
-        case NEW_MESSAGE_RECEIVED:
-            console.log("NEW_MESSAGE_RECEIVED: " + action.payload);
-            
+        case NEW_MESSAGE_RECEIVED:            
             return {
                 ...state,
                 newMessageOwner: action.payload

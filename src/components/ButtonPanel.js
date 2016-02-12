@@ -14,10 +14,8 @@ export default class ButtonPanel extends React.Component {
     }
 
     render() {
-
         const {channels, currentChannel, newMessageOwner} = this.props;
-        console.log("newMessageOwner: " + newMessageOwner);
-        console.log("currentChannel: " + currentChannel);
+        console.log("PROPS: " + JSON.stringify(this.props));
         
         return (
             <div className="button-panel">
@@ -30,39 +28,40 @@ export default class ButtonPanel extends React.Component {
 
                     {channels.map((channel, i) => {
                         return (
-                            <IrcButton key={i} handleClick={::this.onClick}  name={channel.name} currentChannel={this.getCurrentChannel(channel)} newMessageOwner={this.getNewMessageOwner(channel)}/>
+                            <IrcButton 
+                                key={i} 
+                                handleClick={::this.onClick}  
+                                channelName={channel.name} 
+                                currentChannelName={this.getCurrentChannel(channel)} 
+                                newMessageOwner={this.getNewMessageOwner(channel)}/>
                         )
                     })}
+
                 </div>
             </div>
         );
     }
 
+    componentWillReceiveProps(nextProps) {
+        console.log("ButtonPanel, new props");
+    }
+
     getCurrentChannel(channel) {
         const {currentChannel} = this.props;
 
-        let bar = currentChannel == channel.name ? currentChannel : null;
-
-        console.log("bar: " + bar);
-
-        return bar;
+        return currentChannel;
     }
 
     getNewMessageOwner(channel) {
         const {newMessageOwner} = this.props;
 
-        let foo = newMessageOwner == channel.name ? newMessageOwner : null;
-
-        console.log("foo: " + foo);
-
-        return foo;
+        return newMessageOwner;
     }
 
     onClick(id) {
-        console.log("ONCLICK, " + this.state.selectedButton + ",, " + id);
         if (this.state.selectedButton !== id) {
             this.props.onButtonClick(id);
-            console.log("click: " + id);
+
             this.setState({
                 selectedButton: id
             });
