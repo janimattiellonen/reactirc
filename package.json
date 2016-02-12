@@ -1,7 +1,7 @@
 {
-  "name": "web_development_with_js",
+  "name": "renoirc",
   "version": "1.0.0",
-  "description": "Broilerplate",
+  "description": "React powered irc client",
   "main": "src/client.js",
   "scripts": {
     "clean": "rm -r -f ./dist",
@@ -14,12 +14,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com//pekkis/web-development-with-js"
+    "url": "https://github.com/janimattiellonen/renoirc.git"
   },
   "keywords": [
     "team"
   ],
-  "author": "Pekkis",
+  "author": "Janimatti Ellonen",
   "license": "BSD-3-Clause",
   "dependencies": {},
   "devDependencies": {
@@ -80,6 +80,7 @@
     "react-transform-hmr": "^1.0.1",
     "redbox-react": "^1.2.0",
     "redux": "^3.0.5",
+    "redux-simple-router": "^1.0.2",
     "redux-thunk": "^1.0.2",
     "socket.io": "^1.4.0",
     "socket.io-client": "1.4.0",

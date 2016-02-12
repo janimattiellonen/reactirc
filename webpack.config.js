@@ -126,7 +126,7 @@ const envs = {
         plugins: [
             new webpack.optimize.OccurenceOrderPlugin(),
             new HtmlWebpackPlugin({
-                title: 'Pekkis Goes To Movies',
+                title: 'Renoirc',
                 template: 'web/index.prod.html',
                 //favicon: 'web/favicon.ico',
                 inject: 'body',

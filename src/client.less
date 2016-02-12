@@ -2,6 +2,9 @@ body {
     background: #eff2ed !important;
 
 }
+h2 {
+	margin-top: 0 !important;
+}
 
 .wrapper {
 	display: -webkit-box;
@@ -25,13 +28,23 @@ body {
 
 .button-panel {
   	background: #166549;
+
+  	.btn-group {
+  		.active {
+  			background: #dda56c;
+  			border: solid #dda56c 1px;
+  		}
+
+  		.new-message {
+  			color: #c33c3c;
+  		}
+  	}
 }
 
 .window {
 	text-align: left;
 	background: #fafafa;
-	min-height: 300px;
-	max-height: 600px;
+	height: 600px;
 	overflow: auto;
 
 	.message-row {
@@ -60,8 +73,31 @@ body {
 	}
 }
 
+.login-window {
+	background: #eeebe3;
+	padding: 15px;
+	border-radius: 10px;
+	position: absolute;
+	height: auto;
+	width: 290px;
+	margin: -100px 0px 0px -200px;
+	top: 40%;
+	left: 50%;
+
+	h2 {
+		margin-left: 14px;
+	}
+
+	.login-btn {
+		float: right;
+		margin-right: 20px;
+	}
+}
+
 .user-panel {
 	background: #eeebe3;
+	overflow: auto;
+	max-height: 600px;
 
 	ul {
 		list-style-type: none;
@@ -123,3 +159,5 @@ body {
 		width: auto;
 	}
 }
+
+

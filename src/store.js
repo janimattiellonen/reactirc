@@ -1,13 +1,21 @@
-import { createStore, applyMiddleware, combineReducers } from 'redux';
+import { createStore as reduxCreateStore, applyMiddleware, combineReducers } from 'redux';
 import thunk from 'redux-thunk';
+import { routeReducer, syncReduxAndRouter } from 'redux-simple-router';
 
-import * as reducers from './reducers';
 
-const createStoreWithMiddleware = applyMiddleware(
-  thunk
-)(createStore);
+export function createStore(reducers, history) {
+	const createStoreWithMiddleware = applyMiddleware(
+	  thunk
+	)(reduxCreateStore);
 
-const reducer = combineReducers(reducers);
-const store = createStoreWithMiddleware(reducer);
+	const reducer = combineReducers({
+		...reducers,
+		routing: routeReducer
+	});
 
-export default store;
+	const store = createStoreWithMiddleware(reducer);
+
+	syncReduxAndRouter(history, store);
+
+	return store;
+}

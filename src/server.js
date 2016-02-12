@@ -1,8 +1,9 @@
 import uuid from 'node-uuid';
-import { List } from 'immutable';
+import { List, Map} from 'immutable';
 
 import express from 'express';
 import webpack from 'webpack';
+import path from 'path';
 
 import config from '../webpack.config';
 import bodyParser from 'body-parser';
@@ -15,11 +16,7 @@ const port = 8888;
 var io = require('socket.io')(http);
 
 import IrcService from './services/ircService';
-
-let client = null;
-
-let ircService = null;
-
+    
 app.use(require('webpack-dev-middleware')(compiler, {
   noInfo: false,
   publicPath: config.output.publicPath
@@ -45,6 +42,8 @@ http.listen(port, function(){
 
 io.on('connection', function(socket){
     console.log('a user connected');
+    socket.join(socket.id);
+    var ircService = null;
 
     socket.on('message', function(message) {
         ircService.processInput(message);
@@ -55,10 +54,11 @@ io.on('connection', function(socket){
         console.log('app-command: ' + JSON.stringify(data));
 
         if (data.command == 'connect') {
-            client = new net.Socket();
-            ircService = new IrcService(client, io);
+            var client = new net.Socket();
+            ircService = new IrcService(client, io, socket);
             console.log("Connecting to irc...");
             ircService.connect(data.nick, data.host, data.port);
         }
     });
 });
+

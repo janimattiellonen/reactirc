@@ -2,6 +2,8 @@ import axios from 'axios';
 import { List } from 'immutable';
 import io from 'socket.io-client';
 import MessageParser from '../components/domain/MessageParser';
+import { pushPath } from 'redux-simple-router';
+import moment from 'moment';
 
 export const INIT_CONNECTION 		= 'INIT_CONNECTION';
 export const SET_CONNECTED			= 'SET_CONNECTED';
@@ -14,7 +16,10 @@ export const SET_CHANNEL_USERS		= 'SET_CHANNEL_USERS';
 export const SET_CURRENT_CHANNEL	= 'SET_CURRENT_CHANNEL';
 export const JOIN_CHANNEL			= 'JOIN_CHANNEL';
 export const PART_CHANNEL			= 'PART_CHANNEL';
+export const USER_JOINS_CHANNEL		= 'USER_JOINS_CHANNEL';
+export const USER_PARTS_CHANNEL		= 'USER_PARTS_CHANNEL';
 export const MESSAGE_TO_CHANNEL		= 'MESSAGE_TO_CHANNEL';
+export const NEW_MESSAGE_RECEIVED	= 'NEW_MESSAGE_RECEIVED';
 
 let socket = null;
 let parser = new MessageParser();
@@ -25,25 +30,44 @@ export function initIoConnection() {
 			socket = io('http://localhost:8888');
 
 			socket.on('server-message', (data) => {
-				dispatch(receiveMessage(data));
+				console.log('server-message: ' + JSON.stringify(data));
 			});
 
 			socket.on('user-message', (userMessage) => {
-
-				// let's first test this way and later on refacor
-				if (userMessage.command == 'PRIVMSG') {
+				console.log("LUTS user-message: " + JSON.stringify(userMessage));
+				// let's first test this way and later on refactor
+				switch (userMessage.command) {
+					case 'PRIVMSG':
 					// is target a channel
 					if (userMessage.receiver.indexOf('#') === 0) {
 						dispatch(messageToChannel(userMessage));
 					} else {
 						// private message to another user
 					}
+					break;
+					case 'JOIN': 
+						console.log("JOIN (2): " + JSON.stringify(userMessage));
+						dispatch(userJoinsChannel(userMessage.sender, userMessage.receiver));
+						break;
+					case 'PART':
+						dispatch(userPartsChannel(userMessage.sender, userMessage.receiver));
+						break;
+					case 'TOPIC':
+						// userMessage: {"sender":"jme","senderHost":"jme@localhost","command":"TOPIC","receiver":"#foo","message":"Kissa"}
+						dispatch(setChannelTopic({
+							channelName: userMessage.receiver,
+							topic: userMessage.message
+						}));
+						break;
+					default:
+						console.log("Client: unknown user message command: " + userMessage.command);
+					break;
 				}
-
 			});
 
 			// according to irc rfc1459, the user is allowed to join a channel, if the client receives a user list
 			socket.on('channel-users', (data) => {
+				console.log('socket:channel-users: ' + JSON.stringify(data));
 				dispatch(setChannelUsers(data));
 			});
 
@@ -80,9 +104,16 @@ export function connectToIrc(nick, host, port) {
 			port: port
 		});
 
+		dispatch(setCurrentNick(nick));
+		dispatch(setConnected(true))
+		
 		// this assumes connection is ok
 		// we should set connection status depending on success rate
-		return dispatch(setConnected(true));
+
+		//const { state } = getState().routing;
+        //const next = state.next || '/';
+        console.log("about to go to '/'");
+		return dispatch(pushPath('/', {}));
 	}
 }
 
@@ -120,7 +151,8 @@ export function processMessage(message) {
 				message: message,
 				receiver: getState().irc.activeChannel,
 				sender: getState().irc.nick,
-				me: true
+				me: true,
+				ts: moment().format('x')
 			}));
 
 			return dispatch(sendMessage({
@@ -131,11 +163,39 @@ export function processMessage(message) {
 	}
 }
 
+export function activateButton(buttonId) {
+	return function (dispatch, getState) {
+		if (buttonId.indexOf('#') === 0) {
+			return dispatch(setCurrentChannel(buttonId));
+		}
+	}
+}
+
 export function messageToChannel(userMessage) {
+	return function (dispatch, getState) {
+		console.log("user message: " + JSON.stringify(userMessage));
+		dispatch(newMessageReceived(userMessage));
+
+		return dispatch(messageToChannel2(userMessage));
+	}
+}
+
+export function messageToChannel2(userMessage) {
 	return {
 		type: MESSAGE_TO_CHANNEL,
 		payload: userMessage
 	}
+}
+
+export function newMessageReceived(receiver) {
+	return {
+		type: NEW_MESSAGE_RECEIVED,
+		payload: receiver
+	}
+}
+
+export function resetNewMessage(receiver) {
+
 }
 
 export function sendMessage(message) {
@@ -156,6 +216,30 @@ export function partChannel(channelName) {
     	type: PART_CHANNEL,
     	payload: channelName
     };
+}
+
+export function userPartsChannel(nick, channelName) {
+    return {
+    	type: USER_PARTS_CHANNEL,
+    	payload: {
+    		nick: nick,
+    		channelName: channelName
+    	}
+    };
+}
+
+export function userJoinsChannel(nick, channelName) {
+	console.log(`reducer, nick: ${nick}, channel: ${channelName}`);
+	return {
+		type: USER_JOINS_CHANNEL,
+		payload: {
+			user: {
+				nick: nick,
+				op: false
+			},
+			channelName: channelName
+		}
+	};
 }
 
 export function receiveMessage(message) {
